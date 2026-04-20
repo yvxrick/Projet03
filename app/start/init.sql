@@ -1,4 +1,4 @@
-USE projet_03;
+USE `projet03-wserveur_db`;
 
 -- Drop tables in correct order (children first)
 DROP TABLE IF EXISTS connexions;

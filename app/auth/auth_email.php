@@ -1,7 +1,7 @@
 <?php
 require $_SERVER['DOCUMENT_ROOT'] . "/Projet03/app/database/database.php";
 $con = Database::Connect();
-
+header("Access-Control-Allow-Origin: *");
 function authenticate_email($token) {
     global $con;
 

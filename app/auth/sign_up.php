@@ -1,5 +1,5 @@
 <?php
-
+header("Access-Control-Allow-Origin: *");
 require "../email/email.php";
 require "../database/database.php";
 
