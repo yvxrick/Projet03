@@ -9,7 +9,7 @@ class Database {
             $con = new mysqli("localhost", "root", "", "projet_03");
         } catch (mysqli_sql_exception $e) {
             header("HTTP/1.0 500");
-            echo "The database did not respond.";
+            echo "500 Internal server error.";
             die();
         }
         return $con;
