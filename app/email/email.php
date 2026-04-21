@@ -2,6 +2,7 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 require '../phpmailer/vendor/autoload.php';
+require "../start/init_env.php";
 
 class email
 {
@@ -16,8 +17,8 @@ class email
         $this->mail->isSMTP();
         $this->mail->Host = 'smtp.gmail.com';
         $this->mail->SMTPAuth = true;
-        $this->mail->Username = 'riratsey@gmail.com';
-        $this->mail->Password = 'bjzu lvag tuvf yraj';
+        $this->mail->Username = $_ENV['SMTP_EMAIL'];
+        $this->mail->Password = $_ENV['SMTP_PASSWORD'];
         $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
         $this->mail->Port = 465;
         $this->mail->CharSet = "UTF-8";
@@ -63,7 +64,7 @@ class email
 
         $this->mail->Subject = "Confirmation de courriel";
         $this->mail->Body = "<h2> Confirmation de courriel </h2>
-                            Pour confirmer votre adresse courriel <b> $to </b>, veuillez cliquer sur le lien si-dessous: <br>
+                            Pour confirmer votre adresse courriel <b> $to, </b> veuillez cliquer sur le lien si-dessous: <br>
                             <a href='$link'> Confirmer mon adresse courriel </a>";
         try {
             $this->mail->send();

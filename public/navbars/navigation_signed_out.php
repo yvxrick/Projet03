@@ -1,6 +1,6 @@
 <?php
-$login = "login.php";
-$signup = "signup.php";
+$login = "https://projet03-wserveur.alwaysdata.net/index.php?p=login";
+$signup = "https://projet03-wserveur.alwaysdata.net/index.php?p=signup";
 ?>
 
 <div id="navbar">
