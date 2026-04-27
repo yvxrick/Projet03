@@ -1,4 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://projet03-wserveur.alwaysdata.net/private/css/style.css" rel="stylesheet">
+</head>
+
 <?php
+ob_start();
 $page = basename(__FILE__, ".php");
 require_once "../app/functions/session_manager.php";
 require "./navbars/navigation_signed_in.php";
@@ -17,16 +29,6 @@ $no_tel_travail = $user_obj->get_tel_travail();
 $no_tel_cell = $user_obj->get_tel_cellulaire();
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profil</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://projet03-wserveur.alwaysdata.net/private/css/style.css" rel="stylesheet">
-</head>
 <body>
     <form id="form" method="post">
     <div id="container">
@@ -84,6 +86,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $user_obj->set_tel_maison($tel_maison);
     $user_obj->set_tel_travail($tel_travail);
     $user_obj->set_tel_cellulaire($tel_cell);
-
-    header("Location: index.php");
+    $user_obj->add_profile_change();
+    header("Location: index.php?page=1&num_ads=5");
+    echo "OK";
+    ob_get_clean();
 }

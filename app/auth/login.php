@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         die();
     }
 
-    login_user($user_obj->get_id(), $user_obj->get_email());
+    login_user($user_obj->get_id(), $user_obj->get_email(), $user_obj->get_statut());
     $user_obj->add_connection();
 
     echo "OK";

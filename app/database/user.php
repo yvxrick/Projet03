@@ -189,7 +189,7 @@ class user {
     public function is_authenticated() {
         if ($this->exists()) {
             $status = intval($this->con->query(sprintf("SELECT statut FROM utilisateurs WHERE Courriel = '%s'", $this->email))->fetch_row()[0]);
-            return $status === 9;
+            return $status !== 0;
         }
         return false;
     }
@@ -236,6 +236,32 @@ class user {
             $case_1 = $fname !== NULL && $lname !== NULL;
             $case_2 = $fname !== "" && $lname !== "";
             return $case_1 == true && $case_2 == true;
+        }
+        return false;
+    }
+
+    /**
+     * Ajoute le temps de deconnexion dans la table connexions.
+     * @return bool
+     */
+    public function add_disconnection() {
+        if ($this->exists()) {
+            $query = sprintf("UPDATE connexions SET Deconnexion = NOW() WHERE NoUtilisateur = %d", $this->get_id());
+            $this->con->query($query);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Modifie dans la table `utilisateurs` la colonne `Modification` de l'utilisateur.
+     * @return bool
+     */
+    public function add_profile_change() {
+        if ($this->exists()) {
+            $query = sprintf("UPDATE utilisateurs SET Modification = NOW() WHERE Courriel = '%s'", $this->email);
+            $this->con->query($query);
+            return true;
         }
         return false;
     }

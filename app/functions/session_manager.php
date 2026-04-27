@@ -30,13 +30,14 @@ function logout_user()
  * @param $id User's id
  * @return bool
  */
-function login_user($id = null, $email = null) {
-    if ($id == null || $email == null) {
+function login_user($id = null, $email = null, $statut = null) {
+    if ($id == null || $email == null || $statut == null) {
         return false;
     }
 
-    $_SESSION["user_id"] = $id;
+    $_SESSION["user_id"] = intval($id);
     $_SESSION["email"] = $email;
+    $_SESSION["statut"] = intval($statut);
     return true;
 }
 
@@ -92,4 +93,13 @@ function can_access_page($id_to_access) {
         return false;
     }
     return true;
+}
+
+/**
+ * Retourne un booléan indiquant si l'utilisateur est un administrateur.
+ * @return bool
+ */
+function is_admin() {
+    $statut = $_SESSION["statut"];
+    return $statut === 1;
 }

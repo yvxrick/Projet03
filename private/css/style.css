@@ -96,6 +96,10 @@
         gap: 12px;
         flex-wrap: wrap;
         flex-direction: row;
+        width: 70vw;
+        margin: auto;
+        margin-left: 20px;
+        margin-right: 1px;
     }
 
     .ad-card {
@@ -121,7 +125,6 @@
     .ad-card:hover {
         transform: translateY(+3px);
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-        cursor: grab;
     }
 
     .ad-card img {
@@ -156,5 +159,23 @@
         font-size: 11px;
         color: #666;
     }
+    
+    .sorting-div {
+        border: 1px solid black;
+        display: flex;
+        width: 300px;
+        flex-direction: column;
+    }
+
+
+
+
+
+
+
+
+
+
+
 
     

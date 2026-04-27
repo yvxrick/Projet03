@@ -1,17 +1,18 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . "app/database/database.php";
 class annonces {
-    private $con;
+    private mysqli $con;
     public function __construct() {
         $this->con = Database::Connect();
     }
 
     /**
-     * Retorune un array contenant toutes les annonces.
+     * Retorune un array contenant toutes les annonces avec une limite et offset.
      * @return array
      */
-    public function get_all_cards_ads() {
-        return $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie;")->fetch_all(MYSQLI_ASSOC);
+    public function get_all_cards_ads($limit, $offset) {
+        if ($limit > 20) {return [];}
+        return $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
     }
     
     /**
@@ -38,8 +39,32 @@ class annonces {
         $HTML .= "<p class='ad-author'>Paru le: {$ad['Parution']}</p>";
         $HTML .= "</div>";
     }
-
         return $HTML;
+    }
+    
+    /**
+     * Retorune le nombre d'annonces total qui sont actives.
+     * @return int
+     */
+    public function get_number_of_ads_active() {
+        return intval($this->con->query("SELECT COUNT(*) FROM annonces WHERE Etat = 1")->fetch_row()[0]);
+    }
+
+    /**
+     * Retorune un array associative de l'annonce et de son auteur.
+     * @param $id NoAnnonce
+     * @return array
+     */
+    public function get_ad($id) {
+        return $this->con->query("SELECT * FROM annonces a RIGHT JOIN utilisateurs u ON u.NoUtilisateur = a.NoUtilisateur RIGHT JOIN categories c ON c.NoCategorie = a.Categorie WHERE NoAnnonce = '$id'")->fetch_assoc();
+    }
+
+    public function add_ad($ad_title, $ad_desc, $ad_category, $ad_price, $ad_photo, $ad_state, $noUtilisateur) {
+        $query = "INSERT INTO annonces(NoUtilisateur, Parution, Categorie, DescriptionAbregee, DescriptionComplete, Prix, Photo, Etat, MiseAJour) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, NOW())";
+        $stmt = $this->con->prepare($query);
+        $stmt->bind_param("sssssss", $noUtilisateur, $ad_category, $ad_title, $ad_desc, $ad_price, $ad_photo, $ad_state);
+        $stmt->execute();
+        return true;
     }
 
 
@@ -49,22 +74,28 @@ class annonces {
 
 
 
+    /**
+     * SECTION TRI
+     */
+
+
+    /**
+     * Arrange les annonces par leur dates de parutions inverse chronologique.
+     * @param mixed $ads
+     * @return array Retorune une nouvelle `array` contenant le tri.
+     */
+    public function sortByDDP_DESC($limit, $offset) {
+        $ads =  $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie ORDER BY a.Parution DESC LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
+        return $ads;
+    }
 
     /**
      * Arrange les annonces par leur dates de parutions chronologique.
      * @param mixed $ads
-     * @return void
+     * @return array Retorune une nouvelle `array` contenant le tri.
      */
-    public static function sortByDDP_DESC(&$ads) {
-        usort($ads, function($a, $b) {
-            $time_a = intval(strtotime($a["Parution"]));
-            $time_b = intval(strtotime($b["Parution"]));
-            if ($time_a == $time_b) {
-                $id_a = intval($a["NoAnnonce"]);
-                $id_b = intval($b["NoAnnonce"]);
-                return $id_a <=> $id_b;
-            }
-            return $time_b <=> $time_a;
-        }); 
+    public function sortByDDP_ASC($limit, $offset) {
+        $ads =  $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie ORDER BY a.Parution ASC LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
+        return $ads;
     }
 }
