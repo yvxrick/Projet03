@@ -266,6 +266,24 @@ class user {
         return false;
     }
 
-    
+    /**
+     * Crée un nouvel utilisateur.
+     * @param mixed $email
+     * @param mixed $password
+     * @param mixed $email_to_validate Le staut de 0, qui indique que l'utilisateur doit vérifier son courriel
+     * @param mixed $user_hash
+     * @param mixed $zero La valeur 0.
+     * @return bool
+     */
+    public function add_new_user($email, $password, $email_to_validate, $user_hash, $zero) {
+        if (!($this->exists())) {
+            $query = "INSERT INTO utilisateurs(Courriel, MotDePasse, Statut, AutresInfos, NbConnexions, Creation) VALUES (?, ?, ?, ?, ?, NOW())";
+            $stmt = $this->con->prepare($query);
+            $stmt->bind_param("ssisi", $email, $password, $email_to_validate, $user_hash, $zero);
+            $stmt->execute();
+            return true;
+        }
+        return false;
+    }
 
 }

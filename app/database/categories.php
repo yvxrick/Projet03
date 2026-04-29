@@ -16,7 +16,7 @@ class categories {
 
     public function make_categories_list() {
         $categories = $this->get_all_categories();
-        $HTML = "<select required name='ad-categorie' class='form-select'>";
+        $HTML = "<select required id='ad-categorie' name='ad-categorie' class='form-select'>";
         foreach ($categories as $row) {
             $HTML .= "<option value='{$row["NoCategorie"]}'> {$row["Description"]} </option>";
         }

@@ -1,4 +1,5 @@
 <?php
+require_once "../database/user.php";
 require_once "../email/email.php";
 require_once "../database/database.php";
 
@@ -43,9 +44,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         die();
     }
 
+    $user_obj = new user($email);
     // Verify if email is already taken
-    $con->query("SELECT * FROM utilisateurs WHERE Courriel = '$email'");
-    if ($con->affected_rows > 0) {
+    if ($user_obj->exists()) {
         header("HTTP/1.0 409");
         echo "This email is already taken.";
         die();
@@ -54,11 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $user_hash = bin2hex(random_bytes(16));
     
     // Creates new user in DB
-    $query = "INSERT INTO utilisateurs(Courriel, MotDePasse, Statut, AutresInfos, NbConnexions, Creation) VALUES (?, ?, ?, ?, ?, NOW())";
-    $stmt = $con->prepare($query);
-    $stmt->bind_param("ssisi", $email, $password, $email_to_validate, $user_hash, $zero);
-    $stmt->execute();
-
+    $user_obj->add_new_user($email, $password, $email_to_validate, $user_hash, $zero);
 
     $email_obj = new email();
     if ($email_obj->send_confirmation_email($email, $user_hash)) {
