@@ -81,21 +81,37 @@ class annonces {
 
     /**
      * Arrange les annonces par leur dates de parutions inverse chronologique.
-     * @param mixed $ads
      * @return array Retorune une nouvelle `array` contenant le tri.
      */
     public function sortByDDP_DESC($limit, $offset) {
-        $ads =  $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie ORDER BY a.Parution DESC LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
-        return $ads;
+        return $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie ORDER BY a.Parution DESC LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
     }
 
     /**
      * Arrange les annonces par leur dates de parutions chronologique.
-     * @param mixed $ads
      * @return array Retorune une nouvelle `array` contenant le tri.
      */
     public function sortByDDP_ASC($limit, $offset) {
-        $ads =  $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie ORDER BY a.Parution ASC LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
-        return $ads;
+        return $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie ORDER BY a.Parution ASC LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
+    }
+
+    /**
+     * Arrange les annonces par le nom et prénom de l'auteur.
+     * @return array Retorune une nouvelle `array` contenant le tri.
+     */
+    public function sortByLNAME_ASC($limit, $offset) {
+        return $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie ORDER BY u.Nom ASC LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public function sortByLNAME_DESC($limit, $offset) {
+        return $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie ORDER BY u.Nom DESC LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public function sortByFNAME_ASC($limit, $offset) {
+        return $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie ORDER BY u.Prenom ASC LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public function sortByFNAME_DESC($limit, $offset) {
+        return $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie ORDER BY u.Prenom DESC LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
     }
 }

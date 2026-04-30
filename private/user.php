@@ -7,7 +7,7 @@
     <title>Menu principal</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-    <link href="https://projet03-wserveur.alwaysdata.net/private/css/style.css?v=12" rel="stylesheet">
+    <link href="https://projet03-wserveur.alwaysdata.net/private/css/style.css?v=2" rel="stylesheet">
 </head>
 
 
@@ -42,8 +42,31 @@ $user_fname = $user_obj->get_prenom();
 $user_lname = $user_obj->get_nom();
 
 $ads = $ads_obj->get_all_cards_ads($num_ads_page, $offset);
-$ads = $ads_obj->sortByDDP_DESC($num_ads_page, $offset);
 $nb_pages = floor($ads_obj->get_number_of_ads_active() / $num_ads_page);
+
+// Sorting section
+$SORT = $_GET["sort"] ?? null;
+$ORDER = $_GET["order"] ?? null;
+
+$SORTINGS = [
+    "date_paru" => [
+        "asc" => "sortByDDP_ASC",
+        "desc" => "sortByDDP_DESC"
+    ],
+    "fname" => [
+        "asc" => "sortByFNAME_ASC",
+        "desc" => "sortByFNAME_DESC"
+    ],
+    "lname" => [
+        "asc" => "sortByLNAME_ASC",
+        "desc" => "sortByLNAME_DESC"
+    ]   
+];
+$selected_sort = $SORTINGS[$SORT][$ORDER] ?? null;
+if ($selected_sort) {
+    $ads = $ads_obj->$selected_sort($num_ads_page, $offset);
+}
+
 ?>
 
 
@@ -59,17 +82,35 @@ $nb_pages = floor($ads_obj->get_number_of_ads_active() / $num_ads_page);
             <div style="border-bottom: 1px solid black;">
                 <strong>Arranger les annonces</strong>
             </div>
-            <div class="dropdown">
-                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    Nombre d'annonces
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#" onclick="setNumAds(5)">5 annonces</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="setNumAds(10)">10 annonces</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="setNumAds(15)">15 annonces</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="setNumAds(20)">20 annonces</a></li>
-                </ul>
+
+            <!--SECTION TRI D'ANNONCES -->
+            <div class="sorting-div">
+                <p style="text-align: center;">Trier les annonces</p>
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        Nombre d'annonces
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#" onclick="setNumAds(5)">5 annonces</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="setNumAds(10)">10 annonces</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="setNumAds(15)">15 annonces</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="setNumAds(20)">20 annonces</a></li>
+                    </ul>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        Trier par
+                    </button> 
+                    <ul class="dropdown-menu">
+                        <li><a id="date_paru" class="dropdown-item" href="#" onclick="setSortBy_DDP()">Par date de parution</a></li>
+                        <li><a id="lname" class="dropdown-item" href="#" onclick="setSortBy_LNAME()">Par nom de famille</a></li>
+                        <li><a id="fname" class="dropdown-item" href="#" onclick="setSortBy_FNAME()">Par prénom</a></li>
+                    </ul>
+                </div>
             </div>
+
+            <!--FIN TRI D'ANNONCES -->
+
         </div>
         <div class="row g-3 gap-3">
             <?php
@@ -90,6 +131,30 @@ $nb_pages = floor($ads_obj->get_number_of_ads_active() / $num_ads_page);
     <script>
         let changed = false;
         let URLParams = new URLSearchParams(document.location.search);
+        let date_paru_tag = document.getElementById("date_paru")
+        let fname_tag = document.getElementById("fname")
+        let lname_tag = document.getElementById("lname")
+
+        const SORT = URLParams.get("sort")
+        const ORDER = URLParams.get("order")
+        const SORTINGS = {
+            BY_DDP: "date_paru",
+            BY_LNAME: "lname",
+            BY_FNAME: "fname"
+        }
+
+        switch (SORT) {
+            case SORTINGS.BY_DDP:
+                ORDER == "asc" ? date_paru_tag.innerText = "Par date de parution ↑" : date_paru_tag.innerText = "Par date de parution ↓"
+                break;
+            case SORTINGS.BY_FNAME:
+                ORDER == "asc" ? fname_tag.innerText = "Par prénom ↑" : fname_tag.innerText = "Par prénom ↓"
+                break;
+            case SORTINGS.BY_LNAME:
+                ORDER == "asc" ? lname_tag.innerText = "Par nom de famille ↑" : lname_tag.innerText = "Par nom de famille ↓"
+                break;
+        }
+        
 
         if (URLParams.get("page") == null) { URLParams.set("page", "1"); changed = true }
         if (URLParams.get("num_ads") == null) { URLParams.set("num_ads", "5"); changed = true }
@@ -99,6 +164,36 @@ $nb_pages = floor($ads_obj->get_number_of_ads_active() / $num_ads_page);
         function setNumAds(num) {
             URLParams.set("num_ads", num)
             URLParams.set("page", 1)
+            location.search = URLParams
+        }
+
+        function setSortBy_DDP() {
+            if (URLParams.get("sort") == "date_paru") {
+                URLParams.get("order") == "asc" ? URLParams.set("order", "desc") : URLParams.set("order", "asc")
+            } else {
+                URLParams.set("sort", "date_paru")
+                URLParams.set("order", "asc")
+            }
+            location.search = URLParams
+        }
+
+        function setSortBy_LNAME() {
+            if (URLParams.get("sort") == "lname") {
+                URLParams.get("order") == "asc" ? URLParams.set("order", "desc") : URLParams.set("order", "asc")
+            } else {
+                URLParams.set("sort", "lname")
+                URLParams.set("order", "asc")
+            }
+            location.search = URLParams
+        }
+
+        function setSortBy_FNAME() {
+            if (URLParams.get("sort") == "fname") {
+                URLParams.get("order") == "asc" ? URLParams.set("order", "desc") : URLParams.set("order", "asc")
+            } else {
+                URLParams.set("sort", "fname")
+                URLParams.set("order", "asc")
+            }
             location.search = URLParams
         }
     </script>

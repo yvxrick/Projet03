@@ -271,7 +271,7 @@ class user {
      * @param mixed $email
      * @param mixed $password
      * @param mixed $email_to_validate Le staut de 0, qui indique que l'utilisateur doit vérifier son courriel
-     * @param mixed $user_hash
+     * @param mixed $user_hash Hash unique pour chaque utilisateur.
      * @param mixed $zero La valeur 0.
      * @return bool
      */

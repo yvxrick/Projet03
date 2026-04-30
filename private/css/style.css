@@ -161,10 +161,15 @@
     }
     
     .sorting-div {
-        border: 1px solid black;
         display: flex;
         width: 300px;
         flex-direction: column;
+        gap: 5px;
+        max-width: 200px;
+    }
+
+    .sorting-div button {
+        min-width: 200px;
     }
 
 
