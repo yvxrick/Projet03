@@ -16,7 +16,7 @@ $page = basename(__FILE__, ".php");
 require_once "../app/functions/session_manager.php";
 require_once "../app/database/user.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "app/database/annonces.php";
-require "./navbars/navigation_signed_in.php";
+if (!is_admin()) require "./navbars/navigation_signed_in.php";
 require "../app/functions/pagination.php";
 
 $page = $_GET["page"] ?? null;
@@ -42,11 +42,16 @@ $user_fname = $user_obj->get_prenom();
 $user_lname = $user_obj->get_nom();
 
 $ads = $ads_obj->get_all_cards_ads($num_ads_page, $offset);
-$nb_pages = floor($ads_obj->get_number_of_ads_active() / $num_ads_page);
+$nb_pages = ceil($ads_obj->get_number_of_ads_active() / $num_ads_page);
 
 // Sorting section
 $SORT = $_GET["sort"] ?? null;
 $ORDER = $_GET["order"] ?? null;
+$date_begin = $_GET["date_begin"] ?? null;
+$date_end = $_GET["date_end"] ?? null;
+$author_name = $_GET["author_name"] ?? null;
+
+
 
 $SORTINGS = [
     "date_paru" => [
@@ -60,12 +65,27 @@ $SORTINGS = [
     "lname" => [
         "asc" => "sortByLNAME_ASC",
         "desc" => "sortByLNAME_DESC"
-    ]   
+    ],
+    "categorie" => [
+        "asc" => "sortByCategorie_ASC",
+        "desc" => "sortByCategorie_DESC"
+    ] 
 ];
+
+$filters = [
+    "date" => ["begin" => $date_begin, "end" => $date_end],
+    "author" => ["name" => $author_name]
+];
+$ads = $ads_obj->sortByDDP_DESC($num_ads_page, $offset); // Default sorting
+
 $selected_sort = $SORTINGS[$SORT][$ORDER] ?? null;
 if ($selected_sort) {
     $ads = $ads_obj->$selected_sort($num_ads_page, $offset);
 }
+
+
+
+
 
 ?>
 
@@ -105,6 +125,33 @@ if ($selected_sort) {
                         <li><a id="date_paru" class="dropdown-item" href="#" onclick="setSortBy_DDP()">Par date de parution</a></li>
                         <li><a id="lname" class="dropdown-item" href="#" onclick="setSortBy_LNAME()">Par nom de famille</a></li>
                         <li><a id="fname" class="dropdown-item" href="#" onclick="setSortBy_FNAME()">Par prénom</a></li>
+                        <li><a id="categorie" class="dropdown-item" href="#" onclick="setSortBy_Categorie()">Par catégorie</a></li>
+                    </ul>
+                    </ul>
+                </div>
+                <p style="text-align: center;">Moteur de recherche</p>
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        Date de parution
+                    </button>
+                    <ul class="dropdown-menu">
+                        <input id="date_begin" type="date"/>
+                        <label for="date_begin">Du</label>
+                        <input id="date_end" type="date"/>
+                        <label for="date_begin">À</label>
+                        <div style="display: flex; gap: 5px; margin-top: 5%">
+                            <input onclick="setSortBy_TimePeriod()" type="button" class="btn btn-secondary" value="Go">
+                            <input onclick="setSortBy_TimePeriod(true)" type="button" class="btn btn-secondary" value="Retirer">
+                        </div>
+                    </ul> 
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        Auteur
+                    </button>
+                    <ul class="dropdown-menu">
+                        <input onchange="setSortBy_AuthorName()" id="author_name" type="text">
+                        <input onclick="setSortBy_AuthorName(true)" type="button" class="btn btn-secondary" value="Retirer" style="margin-top: 5%;">
                     </ul>
                 </div>
             </div>
@@ -128,19 +175,22 @@ if ($selected_sort) {
         </div>
     </div>
 
+
     <script>
         let changed = false;
         let URLParams = new URLSearchParams(document.location.search);
         let date_paru_tag = document.getElementById("date_paru")
         let fname_tag = document.getElementById("fname")
         let lname_tag = document.getElementById("lname")
+        let categorie_tag = document.getElementById("categorie")
 
         const SORT = URLParams.get("sort")
         const ORDER = URLParams.get("order")
         const SORTINGS = {
             BY_DDP: "date_paru",
             BY_LNAME: "lname",
-            BY_FNAME: "fname"
+            BY_FNAME: "fname",
+            BY_CATEGORIE: "categorie"
         }
 
         switch (SORT) {
@@ -152,6 +202,9 @@ if ($selected_sort) {
                 break;
             case SORTINGS.BY_LNAME:
                 ORDER == "asc" ? lname_tag.innerText = "Par nom de famille ↑" : lname_tag.innerText = "Par nom de famille ↓"
+                break;
+            case SORTINGS.BY_CATEGORIE:
+                ORDER == "asc" ? categorie_tag.innerText = "Par catégorie ↑" : categorie_tag.innerText = "Par catégorie ↓"
                 break;
         }
         
@@ -196,6 +249,43 @@ if ($selected_sort) {
             }
             location.search = URLParams
         }
+
+        function setSortBy_Categorie() {
+            if (URLParams.get("sort") == "categorie") {
+                URLParams.get("order") == "asc" ? URLParams.set("order", "desc") :URLParams.set("order", "asc")
+            } else {
+                URLParams.set("sort", "categorie")
+                URLParams.set("order", "asc")
+            }
+            location.search = URLParams
+        }
+
+        function setSortBy_TimePeriod(removeSort) {
+            if (removeSort) {
+                URLParams.delete("date_begin")
+                URLParams.delete("date_end")
+                location.search = URLParams
+                return;
+            }
+            let date_begin = document.getElementById("date_begin").value
+            let date_end = document.getElementById("date_end").value
+            if (date_begin == "" || date_end == "") return;
+            URLParams.set("date_begin", date_begin)
+            URLParams.set("date_end", date_end)
+            location.search = URLParams
+        }
+
+        function setSortBy_AuthorName(removeSort) {
+            let author_name = document.getElementById("author_name").value
+            if (removeSort) {
+                URLParams.delete("author_name")
+                location.search = URLParams
+                return;
+            }
+            URLParams.set("author_name", author_name)
+            location.search = URLParams
+        }
+
     </script>
 
 </body>

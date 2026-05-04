@@ -23,8 +23,6 @@ class annonces {
     $HTML = "";
 
     foreach ($ads as $ad) {
-        if (intval($ad['Etat']) !== 1) continue; // skip les annonces non actives
-
         $img = !empty($ad['Photo']) 
             ? $ad['Photo'] 
             : "placeholder.jpg";
@@ -41,6 +39,40 @@ class annonces {
     }
         return $HTML;
     }
+
+    public function load_all_cards_users_ads($ads) {
+        $HTML = "";
+        $etats = ["1" => "Actif", "2" => "Inactif", "3" => "Retiré"];
+        foreach ($ads as $ad) {
+            $img = !empty($ad['Photo']) 
+            ? $ad['Photo'] 
+            : "placeholder.jpg";
+            
+            $HTML .= "<div class='ad-card' onclick='window.location.href = `https://projet03-wserveur.alwaysdata.net/private/my_ad.php?id={$ad['NoAnnonce']}`'>";
+            $HTML .= "<img src='https://projet03-wserveur.alwaysdata.net/private/ads-images/$img'>";
+            $HTML .= "<p class='ad-title'>{$ad['DescriptionAbregee']}</p>";
+            $HTML .= "<p class='ad-author'>{$ad['Prenom']} {$ad['Nom']}</p>";
+            $HTML .= "<p class='ad-category'>{$ad['Categorie']}</p>";
+            $HTML .= "<p class='ad-price'>" . number_format($ad['Prix'], 2) . " $</p>";
+            $HTML .= "<p class='ad-author'>ID: {$ad['NoAnnonce']}</p>";
+            $HTML .= "<p class='ad-author'>Paru le: {$ad['Parution']}</p>";
+            $HTML .= "<p class='ad-title'>Etat: {$etats[$ad['Etat']]}"; 
+            $HTML .= "</div>";
+        }   
+            return $HTML;
+        }
+    /**
+     * Évalue si l'annonce demandé appartient à un utilisateur spécifique.
+     * @param mixed $users_id
+     * @param mixed $ad_id
+     * @return bool `True` si l'annonce appartient à l'utilisateur, `False` sinon.
+     */
+    public function is_users_ad($users_id, $ad_id) {
+        $response_id = $this->con->query("SELECT NoUtilisateur FROM annonces WHERE NoAnnonce = '$ad_id'")->fetch_row();
+        if ($response_id == null) {return false;}
+        return intval($response_id[0]) === $users_id;
+    }
+    
     
     /**
      * Retorune le nombre d'annonces total qui sont actives.
@@ -67,6 +99,14 @@ class annonces {
         return true;
     }
 
+    public function get_all_users_add($user_id, $offset) {
+        return $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie WHERE a.NoUtilisateur = '$user_id' ORDER BY a.Parution ASC LIMIT 10 OFFSET $offset")->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public function get_number_all_ads_users($user_id) {
+        return intval($this->con->query("SELECT COUNT(*) FROM annonces a WHERE a.NoUtilisateur = '$user_id'")->fetch_row()[0]);
+    }
+
 
 
 
@@ -84,7 +124,7 @@ class annonces {
      * @return array Retorune une nouvelle `array` contenant le tri.
      */
     public function sortByDDP_DESC($limit, $offset) {
-        return $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie ORDER BY a.Parution DESC LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
+        return $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie WHERE Etat = 1 ORDER BY a.Parution DESC LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
     }
 
     /**
@@ -92,7 +132,7 @@ class annonces {
      * @return array Retorune une nouvelle `array` contenant le tri.
      */
     public function sortByDDP_ASC($limit, $offset) {
-        return $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie ORDER BY a.Parution ASC LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
+        return $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie WHERE Etat = 1 ORDER BY a.Parution ASC LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
     }
 
     /**
@@ -100,18 +140,34 @@ class annonces {
      * @return array Retorune une nouvelle `array` contenant le tri.
      */
     public function sortByLNAME_ASC($limit, $offset) {
-        return $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie ORDER BY u.Nom ASC LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
+        return $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie WHERE Etat = 1 ORDER BY u.Nom ASC LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
     }
 
     public function sortByLNAME_DESC($limit, $offset) {
-        return $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie ORDER BY u.Nom DESC LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
+        return $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie WHERE Etat = 1 ORDER BY u.Nom DESC LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
     }
 
     public function sortByFNAME_ASC($limit, $offset) {
-        return $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie ORDER BY u.Prenom ASC LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
+        return $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie WHERE Etat = 1 ORDER BY u.Prenom ASC LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
     }
 
     public function sortByFNAME_DESC($limit, $offset) {
-        return $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie ORDER BY u.Prenom DESC LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
+        return $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie WHERE Etat = 1 ORDER BY u.Prenom DESC LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
     }
+
+    public function sortByCategorie_ASC($limit, $offset) {
+        return $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie WHERE Etat = 1 ORDER BY c.Description ASC LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
+    }
+    public function sortByCategorie_DESC($limit, $offset) {
+        return $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie WHERE Etat = 1 ORDER BY c.Description DESC LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public function sortByTimePeriod($date_begin, $date_end, $limit, $offset) {
+        return $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie WHERE a.Parution AND Etat = 1 BETWEEN '$date_begin' AND '$date_end' LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public function sortByAuthorName($author_name, $limit, $offset) {
+        return $this->con->query("SELECT a.NoAnnonce, a.DescriptionAbregee, a.Prix, a.Photo, a.Etat, u.Nom, u.Prenom, a.Parution ,c.Description AS Categorie FROM annonces a JOIN utilisateurs u ON a.NoUtilisateur = u.NoUtilisateur JOIN categories c ON a.Categorie = c.NoCategorie WHERE u.Nom AND Etat = 1 LIKE '$author_name' OR u.Prenom LIKE '$author_name' LIMIT $limit OFFSET $offset;")->fetch_all(MYSQLI_ASSOC);
+    }
+
 }

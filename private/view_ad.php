@@ -40,7 +40,7 @@ $ad_photo = $ad["Photo"];
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://projet03-wserveur.alwaysdata.net/private/css/style.css?v=1" rel="stylesheet">
+    <link href="https://projet03-wserveur.alwaysdata.net/private/css/style.css?v=22" rel="stylesheet">
 </head>
 
 <body style="background-color: #f5f7fa;">
@@ -48,11 +48,10 @@ $ad_photo = $ad["Photo"];
 
     <div class="card shadow-sm border-0">
         <div class="row g-0">
-            <div class="col-md-6">
+            <div class="col-md-6 view_ad">
                 <img 
                     src="<?php echo "https://projet03-wserveur.alwaysdata.net/private/ads-images/$ad_photo" ?>"
-                    class="img-fluid rounded-start h-100"
-                    style="object-fit: cover;"
+                    class="rounded-start"
                 >
             </div>
             <div class="col-md-6">

@@ -8,6 +8,7 @@ $profil = "https://projet03-wserveur.alwaysdata.net/private/profil.php";
     <ul>
         <li><a href='https://projet03-wserveur.alwaysdata.net/private/logout.php'>Déconnexion</a></li>
         <li class='<?php echo page_active("profil", $page) ?>'><a href='<?php echo $profil ?>'>Profil</a></li>
+        <li class='<?php echo page_active("my_ads", $page) ?>'><a href="https://projet03-wserveur.alwaysdata.net/private/my_ads.php">Mes annonces</a></li>
         <li class='<?php echo page_active("add_ad", $page)?>'><a href='https://projet03-wserveur.alwaysdata.net/private/add_ad.php'>Ajouter une annonce</a></li>
         <li class='<?php echo page_active("user", $page)?>'><a href='https://projet03-wserveur.alwaysdata.net/private/index.php?page=1&num_ads=5'>Menu principal</a></li>
     </ul>
