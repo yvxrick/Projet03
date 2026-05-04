@@ -1,6 +1,6 @@
 <?php
 /**
- * Fait la pagination pour le menu principal des annonces.
+ * Fait la pagination pour le menu principal des annonces. Limite de 5 pages.
  * @param int $num_total_pages Le nombre total de pages
  * @return void
  */
