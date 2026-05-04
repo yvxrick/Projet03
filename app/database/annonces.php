@@ -1,5 +1,8 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . "app/database/database.php";
+/**
+ * Classe utilitaires pour gérer tout ce qui touche les annonces.
+ */
 class annonces {
     private mysqli $con;
     public function __construct() {
@@ -48,7 +51,7 @@ class annonces {
             ? $ad['Photo'] 
             : "placeholder.jpg";
             
-            $HTML .= "<div class='ad-card' onclick='window.location.href = `https://projet03-wserveur.alwaysdata.net/private/my_ad.php?id={$ad['NoAnnonce']}`'>";
+            $HTML .= "<div class='ad-card' href=`https://projet03-wserveur.alwaysdata.net/private/my_ad.php?id={$ad['NoAnnonce']}`>";
             $HTML .= "<img src='https://projet03-wserveur.alwaysdata.net/private/ads-images/$img'>";
             $HTML .= "<p class='ad-title'>{$ad['DescriptionAbregee']}</p>";
             $HTML .= "<p class='ad-author'>{$ad['Prenom']} {$ad['Nom']}</p>";
@@ -105,6 +108,35 @@ class annonces {
 
     public function get_number_all_ads_users($user_id) {
         return intval($this->con->query("SELECT COUNT(*) FROM annonces a WHERE a.NoUtilisateur = '$user_id'")->fetch_row()[0]);
+    }
+
+    public function modify_ad($ad_id, $ad_title, $ad_desc, $ad_category, $ad_price, $ad_photo, $ad_state, $keep) {
+        if ($keep) {
+            $query = "UPDATE annonces SET Categorie = ?, DescriptionAbregee = ?, DescriptionComplete = ?, Prix = ?, MiseAJour = NOW(), Etat = ? WHERE NoAnnonce = ?";
+            $stmt = $this->con->prepare($query);
+            $stmt->bind_param("issiii", $ad_category, $ad_title, $ad_desc, $ad_price, $ad_state, $ad_id);
+            $stmt->execute();
+            return true;
+        }
+        if ($ad_photo == null) {return false;}
+        $query = "UPDATE annonces SET Categorie = ?, DescriptionAbregee = ?, DescriptionComplete = ?, Prix = ?, MiseAJour = NOW(), Etat = ?, Photo = ? WHERE NoAnnonce = ?";
+        $stmt = $this->con->prepare($query);
+        $stmt->bind_param("issiisi",$ad_category, $ad_title, $ad_desc, $ad_price, $ad_state, $ad_photo, $ad_id);
+        $stmt->execute();
+        return true;
+    }
+
+    /**
+     * Mets l'état d'une annonce à retiré.
+     * @param mixed $ad_id
+     * @return boolean
+     */
+    public function remove_ad($ad_id) {
+        $query = "UPDATE annonces SET Etat = 3 WHERE NoAnnonce = ?";
+        $stmt = $this->con->prepare($query);
+        $stmt->bind_param("i", $ad_id);
+        $stmt->execute();
+        return true;
     }
 
 

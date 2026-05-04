@@ -41,7 +41,7 @@ $categories_options = $categories_obj->make_categories_list();
                 <span style="font-weight: bold; color: green">$CAD</span>
             </div>
             <p>Photo</p>
-            <input required class="form-control" id="ad-photo" name="ad-photo" type="file" value="Choisir" accept=".jpeg .png .gif">
+            <input required class="form-control" id="ad-photo" name="ad-photo" type="file" value="Choisir" accept=".jpg, .png, .gif">
             <p>État de l'annonce</p>
             <select style="max-width: 20%;" class="form-control" required id="ad-state" name="ad-state">
                 <option value="1">Actif</option>
@@ -120,7 +120,6 @@ $categories_options = $categories_obj->make_categories_list();
                     status_div.hidden = false
                     break;              
             }
-            console.log(response)
 
         }
         function closeStatusMsg() {

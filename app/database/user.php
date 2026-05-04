@@ -1,5 +1,8 @@
 <?php
 require_once "database.php";
+/**
+ * Classe utilitaires pour gérer tout ce qui touche les utilisateurs.
+ */
 class user {
     /**
      * Connection à la base de donnée
