@@ -8,9 +8,19 @@ function make_pagination_annonces($num_total_pages)
 {
     $current_page = $_GET["page"] ?? null;
     $current_page == 1 ? $pagination = "<input class='btn btn-secondary' disabled type='button' value='<' onclick='setPage(-1, false)'>" : $pagination = "<input class='btn btn-secondary' type='button' value='<' onclick='setPage(-1, false)'>";
-    for ($i = 0; $i < $num_total_pages; $i++) {
-        $n = $i + 1;
-        $n == $current_page ? $pagination .= "<input class='btn btn-secondary active' type='button' value='$n' onclick='setPage($n, true)'>" : $pagination .= "<input class='btn btn-secondary' type='button' value='$n' onclick='setPage($n, true)'>";
+    if ($num_total_pages <= 5) {
+        for ($i = 0; $i < $num_total_pages; $i++) {
+            $n = $i + 1;
+            $n == $current_page ? $pagination .= "<input class='btn btn-secondary active' type='button' value='$n' onclick='setPage($n, true)'>" : $pagination .= "<input class='btn btn-secondary' type='button' value='$n' onclick='setPage($n, true)'>";
+        }
+    } else {
+        for ($i = 0; $i < 5; $i++) {
+            $n = $i + 1;
+            $n == $current_page ? $pagination .= "<input class='btn btn-secondary active' type='button' value='$n' onclick='setPage($n, true)'>" : $pagination .= "<input class='btn btn-secondary' type='button' value='$n' onclick='setPage($n, true)'>";
+            if ($i == 4) {
+                $current_page == $num_total_pages ? $pagination .= "<input class='btn btn-secondary active' type='button' value='$num_total_pages' onclick='setPage($num_total_pages, true)'>" : $pagination .= "<input class='btn btn-secondary' type='button' value='$num_total_pages' onclick='setPage($num_total_pages, true)'>";
+            }
+        }   
     }
 
     $current_page == $num_total_pages ? $pagination .= "<input class='btn btn-secondary' disabled type='button' value='>' onclick='setPage(1, false)'>" : $pagination .= "<input class='btn btn-secondary' type='button' value='>' onclick='setPage(1, false)'>";
