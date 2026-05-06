@@ -16,7 +16,7 @@ require_once "../app/database/user.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "app/database/annonces.php";
 require "./navbars/navigation_signed_in.php";
 require "../app/functions/pagination.php";
-
+logout_if_no_session();
 // Always 10 ads per page
 $page = $_GET["page"] ?? 1;
 if ($page == "NaN") {$page = 1;}

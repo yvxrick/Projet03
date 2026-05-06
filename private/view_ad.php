@@ -1,3 +1,13 @@
+<?php
+require_once "../app/database/annonces.php";
+require_once "../app/functions/session_manager.php";
+require "./navbars/navigation_signed_in.php";
+logout_if_no_session();
+$ad_id = $_GET["id"]; 
+$ads_obj = new annonces();
+$ad = $ads_obj->get_ad($ad_id);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -19,13 +29,6 @@
 </head>
 
 <?php
-require_once "../app/database/annonces.php";
-require_once "../app/functions/session_manager.php";
-require "./navbars/navigation_signed_in.php";
-logout_if_no_session();
-$ads_obj = new annonces();
-$ad_id = $_GET["id"];
-$ad = $ads_obj->get_ad($ad_id);
 if ($ad == null) {
     header("Location: index.php");
     die();

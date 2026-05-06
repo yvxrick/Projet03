@@ -46,11 +46,12 @@ $no_tel_cell = $user_obj->get_tel_cellulaire();
         <p>Téléphone au travail</p> <input id="tel-travail" name="tel-travail" class="form-control" style="width: 250px;" type="text" value="<?php echo $no_tel_travail ?>">
         <p>Téléphone cellulaire</p> <input id="tel-cell=" name="tel-cell" class="form-control" style="width: 250px;" type="text" value="<?php echo $no_tel_cell ?>">
         <p id="legend">Légende: <span id="required">* requis</span></p>
-        <input style="margin-top: 10px;" class="btn btn-primary" type="button" value="Enregistrer" onclick="validateForm()">
+        <input id="btn-send" style="margin-top: 10px;" class="btn btn-primary" type="button" value="Enregistrer" onclick="validateForm()">
     </div>
     </form>
     <script>
         let canSendForm = true;
+        let btn_send = document.getElementById("btn-send")
         function validateForm() {
             // a mettre statut empl qui sera une liste déroulante
             let nom_famille = document.getElementById("nom-famille");
@@ -65,6 +66,8 @@ $no_tel_cell = $user_obj->get_tel_cellulaire();
         }
         function sendForm() {
             // a mettre statut empl
+            btn_send.disabled = true;
+            btn_send.value = "En cours d'enregistrement...";
             document.getElementById("form").submit()
         }
     </script>

@@ -83,7 +83,7 @@ if ($selected_sort) {
     $ads = $ads_obj->$selected_sort($num_ads_page, $offset);
 }
 
-
+$cards = $ads_obj->load_cards_ads_html($ads);
 
 
 
@@ -161,11 +161,8 @@ if ($selected_sort) {
         </div>
         <div class="row g-3 gap-3">
             <?php
-            if (empty($ads_obj->load_cards_ads_html($ads))) {
-                echo '<div class="text-center text-muted py-5">Aucune annonces disponibles.</div>';
-            } else {
-                echo $ads_obj->load_cards_ads_html($ads);
-            }
+                if (empty($cards)) {echo '<div class="text-center text-muted py-5">Aucune annonces disponibles.</div>';}
+                else {echo $cards;}
             ?>
         </div>
         <div class="d-flex justify-content-center mt-4">

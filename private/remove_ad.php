@@ -1,10 +1,37 @@
 <?php
 require_once "../app/database/annonces.php";
 require_once "../app/functions/session_manager.php";
+$user_id = $_SESSION["user_id"] ?? null;
+$ad_id = $_GET["id"];
+$ads_obj = new annonces(); 
+if (!($ads_obj->is_users_ad($user_id, $ad_id))) {
+    require "./forbidden.html";
+    die();
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supprimer mon annonce</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://projet03-wserveur.alwaysdata.net/private/css/style.css?v=22" rel="stylesheet">
+</head>
+
+<?php
 require "./navbars/navigation_signed_in.php";
 logout_if_no_session();
-$ads_obj = new annonces();
-$ad_id = $_GET["id"];
 $ad = $ads_obj->get_ad($ad_id);
 if ($ad == null) {
     header("Location: index.php");
@@ -19,29 +46,14 @@ $ad_price = number_format($ad["Prix"], 2, ".") . " $";
 $ad_date_added = $ad["Parution"];
 $ad_date_modified = $ad["MiseAJour"];
 $ad_photo = $ad["Photo"];
+$ad_state = $ad["Etat"];
 
+if ($ad_state == 3) { // Already removed
+    echo "<p style='text-align: center; margin-top: 10px;'> Cette annonce à déjà été retiré. Vous allez être redirigé... </p>";
+    header("Refresh: 3; url=my_ads.php");
+    exit;
+}
 ?>
-
-
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Annonce #<?php echo $ad["NoAnnonce"] ?></title>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
-        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
-        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-        crossorigin="anonymous"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://projet03-wserveur.alwaysdata.net/private/css/style.css?v=22" rel="stylesheet">
-</head>
 
 <body style="background-color: #f5f7fa;">
     <div class="container mb-5">
@@ -53,7 +65,6 @@ $ad_photo = $ad["Photo"];
         <div class="card shadow-sm border-0">
             <div id="remove-msg-div" style="background-color: red; border: 1px solid black;" class="pb-2 p-1">
                 <h3 style="color: yellow">Êtes-vous sûr de vouloir supprimer cette annonce ?</h3>
-                <label style="color: white">Cette action n'est pas reversible.</label>
             </div>
             <div class="row g-0">
                 <div class="col-md-6 view_ad">
