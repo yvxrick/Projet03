@@ -92,6 +92,7 @@ $cards = $ads_obj->load_cards_ads_html($ads);
 
 
 <body style="background-color: rgba(0, 0, 0, 0.03);">
+    <h3> Bonjour, <?php echo $user_obj->get_prenom();?> !</h3>
     <div class="container py-4">
         <div class="text-center mb-4">
             <h2 class="fw-bold">Annonces</h2>

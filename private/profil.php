@@ -14,6 +14,7 @@ ob_start();
 $page = basename(__FILE__, ".php");
 require_once "../app/functions/session_manager.php";
 require "./navbars/navigation_signed_in.php";
+require $_SERVER['DOCUMENT_ROOT'] . "app/functions/status.php";
 
 $user_email = $_SESSION["email"];
 $user_obj = new user($user_email);
@@ -27,13 +28,17 @@ $no_empl = $user_obj->get_no_employe();
 $no_tel_maison = $user_obj->get_tel_maison();
 $no_tel_travail = $user_obj->get_tel_travail();
 $no_tel_cell = $user_obj->get_tel_cellulaire();
+
+$no_tel_maison_public = $user_obj->get_house_number_visibility() == "P" ? true : false;
+$no_tel_travail_public = $user_obj->get_work_number_visibility() == "P" ? true : false;
+$no_tel_cell_public = $user_obj->get_phone_number_visibility() == "P" ? true : false;
 ?>
 
 <body>
     <form id="form" method="post">
     <div id="container">
         <p id="header" style="text-align: center;">Mon profil</p>
-        <p>Statut d'employé</p> <?php ?>
+        <p>Statut d'employé</p> <?php echo make_status($user_obj->get_statut()) ?>
         <p>No. d'employé</p> <input name="no-employe" class="form-control" style="width: 100px;" type="number" value="<?php echo $no_empl ?>">
         <p>Nom de famille <span id="required">*</span> </p> <input id="nom-famille" name="nom-famille" class="form-control" style="width: 250px; margin-bottom: 0px;" type="text" value="<?php echo $lname ?>">
         <label hidden="true" id="err_lname" class="invalid-fields">Veuillez entrer votre nom de famille</label>
@@ -45,6 +50,13 @@ $no_tel_cell = $user_obj->get_tel_cellulaire();
         <p>Téléphone à la maison</p> <input id="tel-maison" name="tel-maison" class="form-control" style="width: 250px;" type="text" value="<?php echo $no_tel_maison?>">
         <p>Téléphone au travail</p> <input id="tel-travail" name="tel-travail" class="form-control" style="width: 250px;" type="text" value="<?php echo $no_tel_travail ?>">
         <p>Téléphone cellulaire</p> <input id="tel-cell=" name="tel-cell" class="form-control" style="width: 250px;" type="text" value="<?php echo $no_tel_cell ?>">
+        <div>
+            Informations de contact publiques:
+            <br>
+            <input <?php echo $no_tel_maison_public == true ? "checked" : ""; ?> name="contact-info-public-maison" type="checkbox" id="contact-info-public-maison" value="true"> Maison |
+            <input <?php echo $no_tel_travail_public == true ? "checked" : ""; ?> name="contact-info-public-travail" type="checkbox" id="contact-info-public-travail" value="true"> Travail |
+            <input <?php echo $no_tel_cell_public == true ? "checked" : ""; ?> name="contact-info-public-cel" type="checkbox" id="contact-info-public-cel" value="true"> Cellulaire |
+        </div>
         <p id="legend">Légende: <span id="required">* requis</span></p>
         <input id="btn-send" style="margin-top: 10px;" class="btn btn-primary" type="button" value="Enregistrer" onclick="validateForm()">
     </div>
@@ -76,19 +88,25 @@ $no_tel_cell = $user_obj->get_tel_cellulaire();
 
 <?php
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
+    $set_public_tel_maison = $_POST["contact-info-public-maison"] ?? null;
+    $set_public_tel_travail = $_POST["contact-info-public-travail"] ?? null;
+    $set_public_tel_cel = $_POST["contact-info-public-cel"] ?? null;
+
     $no_empl = $_POST["no-employe"] ?? "";
     $nom_famille = $_POST["nom-famille"] ?? "";
     $prenom = $_POST["prenom"] ?? "";
     $tel_maison = $_POST["tel-maison"] ?? "";
     $tel_travail = $_POST["tel-travail"] ?? "";
     $tel_cell = $_POST["tel-cell"] ?? "";
+    $statut = $_POST["statut"] ?? null;
 
+    $user_obj->set_statut($statut);
     $user_obj->set_no_empl($no_empl);
     $user_obj->set_nom($nom_famille);
     $user_obj->set_prenom($prenom);
-    $user_obj->set_tel_maison($tel_maison);
-    $user_obj->set_tel_travail($tel_travail);
-    $user_obj->set_tel_cellulaire($tel_cell);
+    $user_obj->set_tel_maison($tel_maison, $set_public_tel_maison);
+    $user_obj->set_tel_travail($tel_travail, $set_public_tel_travail);
+    $user_obj->set_tel_cellulaire($tel_cell, $set_public_tel_cel);
     $user_obj->add_profile_change();
     header("Location: index.php?page=1&num_ads=5");
     echo "OK";

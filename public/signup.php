@@ -34,12 +34,16 @@ require "footers/footer.php";
             <label>Mot de passe</label>
             <input onkeyup="validePassword()" class="form-control" type="password" id="password" name="password"
                 placeholder="Mot de passe">
+            <label>Confirmer votre mot de passe</label>
+            <input class="form-control" type="password" id="password-confirm"
+                placeholder="Confirmer votre mot de passe">
             <div hidden="true" id="invalid-password" class="invalid-fields">
                 <label>Le mot de passe doit respecter les contraintes suivantes:
                     <ul>
                         <li>Doit contenir 5 à 15 caractères</li>
                         <li>Doit contenir au moins un caractère minuscule et majuscule</li>
                         <li>Doit contenir au moins un chiffre</li>
+                        <li>Les mots de passes doivent être identiques</li>
                     </ul>
                 </label>
             </div>
@@ -80,12 +84,16 @@ require "footers/footer.php";
         function validePassword() {
             let regex_passwd = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{5,15}$/
             let passwd = document.getElementById("password").value
+            let passwd_confirm = document.getElementById("password-confirm").value
+
             passwd_valide = regex_passwd.test(passwd)
 
             err_passwd.hidden = passwd_valide
         }
 
         function sendForm() {
+            let passwd = document.getElementById("password").value
+            let passwd_confirm = document.getElementById("password-confirm").value
             let canSendForm = true
 
             if (!email_match) {
@@ -96,6 +104,14 @@ require "footers/footer.php";
                 err_passwd.hidden = false
                 canSendForm = false
             }
+            if (passwd != passwd_confirm) {
+                canSendForm = false;
+                err_passwd.hidden = false; 
+            } else {
+                err_passwd.hidden = true
+            }
+
+
             if (canSendForm) {
                 let email = document.getElementById("email").value
                 let email_confirm = document.getElementById("email-confirm").value

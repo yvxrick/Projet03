@@ -15,7 +15,9 @@ $page = basename(__FILE__, ".php");
 require_once "../app/functions/session_manager.php";
 require_once "./navbars/navigation_signed_in.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "app/database/categories.php";
+$user_email = $_SESSION["email"];
 logout_if_no_session();
+redirect_if_no_profile($user_email);
 $categories_obj = new categories();
 $categories_options = $categories_obj->make_categories_list();
 ?>

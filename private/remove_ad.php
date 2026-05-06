@@ -1,6 +1,7 @@
 <?php
 require_once "../app/database/annonces.php";
 require_once "../app/functions/session_manager.php";
+logout_if_no_session();
 $user_id = $_SESSION["user_id"] ?? null;
 $ad_id = $_GET["id"];
 $ads_obj = new annonces(); 
@@ -31,7 +32,6 @@ if (!($ads_obj->is_users_ad($user_id, $ad_id))) {
 
 <?php
 require "./navbars/navigation_signed_in.php";
-logout_if_no_session();
 $ad = $ads_obj->get_ad($ad_id);
 if ($ad == null) {
     header("Location: index.php");

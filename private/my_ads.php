@@ -16,6 +16,8 @@ require_once "../app/database/user.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "app/database/annonces.php";
 require "./navbars/navigation_signed_in.php";
 require "../app/functions/pagination.php";
+$user_email = $_SESSION["email"];
+redirect_if_no_profile($user_email);
 logout_if_no_session();
 // Always 10 ads per page
 $page = $_GET["page"] ?? 1;

@@ -1,11 +1,14 @@
 <?php
 require_once "../app/database/annonces.php";
+require_once "../app/database/user.php";
 require_once "../app/functions/session_manager.php";
 require "./navbars/navigation_signed_in.php";
 logout_if_no_session();
-$ad_id = $_GET["id"]; 
+$ad_id = $_GET["id"];
 $ads_obj = new annonces();
 $ad = $ads_obj->get_ad($ad_id);
+$ad_author_email = $ad["Courriel"];
+$user_obj = new user($ad_author_email);
 ?>
 
 <!DOCTYPE html>
@@ -43,6 +46,10 @@ $ad_date_added = $ad["Parution"];
 $ad_date_modified = $ad["MiseAJour"];
 $ad_photo = $ad["Photo"];
 
+$show_maison_number = $user_obj->get_house_number_visibility() == "P" ? true : false;
+$show_travail_number = $user_obj->get_work_number_visibility() == "P" ? true : false;
+$show_cell_number = $user_obj->get_phone_number_visibility() == "P" ? true : false;
+$has_contact_info = $show_maison_number || $show_travail_number || $show_cell_number;
 ?>
 
 <body style="background-color: #f5f7fa;">
@@ -77,6 +84,15 @@ $ad_photo = $ad["Photo"];
                             <p class="mb-1">
                                 <strong>Mis à jour:</strong> <?php echo $ad_date_modified ?>
                             </p>
+                        <?php endif; ?>
+                    </div>
+                    <hr>
+                    <div class="contact-info">
+                        <?php if ($has_contact_info): ?>
+                            <strong>Informations de contact</strong>
+                            <?php if ($show_maison_number == true): ?>
+                                <p>Numéro de téléphone: <?php echo $user_obj->get_tel_maison(); ?> </p>
+                            <?php endif; ?>
                         <?php endif; ?>
                     </div>
                     <div class="mt-auto">

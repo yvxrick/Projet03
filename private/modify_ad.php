@@ -3,7 +3,6 @@ $page = basename(__FILE__, ".php");
 require_once "../app/functions/session_manager.php";
 require_once "../app/database/user.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "app/database/annonces.php";
-require "./navbars/navigation_signed_in.php";
 require "../app/functions/pagination.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "app/database/categories.php";
 $categories_obj = new categories();
@@ -15,7 +14,7 @@ $user_obj = new user($user_email);
 $ads_obj = new annonces();
 logout_if_no_session();
 if (!$ads_obj->is_users_ad($user_id, $ad_id)) {
-    header("Location: forbidden.html");
+    require "./forbidden.html";
     exit();
 }
 $ad = $ads_obj->get_ad($ad_id);
@@ -25,6 +24,8 @@ $ad_title = $ad["DescriptionAbregee"];
 $ad_desc = $ad["DescriptionComplete"];
 $ad_price = $ad["Prix"];
 $ad_photo = $ad["Photo"];
+
+require "./navbars/navigation_signed_in.php";
 ?>
 
 <!DOCTYPE html>

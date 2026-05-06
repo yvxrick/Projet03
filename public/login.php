@@ -98,7 +98,7 @@ require "footers/footer.php";
             }
             if (response === status.NOT_AUTHENTICATED) {
                 login_msg_div.style.backgroundColor = "red"
-                stauts_msg.innerHTML = "Votre compte existe, mais il n'est pas authentifié."
+                stauts_msg.innerHTML = "Votre email n'a pas été validé."
                 login_msg_div.hidden = false
                 return;
             }

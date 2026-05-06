@@ -86,14 +86,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             if (is_file($old_ad_photo_path)) {
                 unlink($old_ad_photo_path);
             }
-            $ads_obj->modify_ad($ad_id, $ad_title, $ad_desc, $ad_category, $ad_price, $ad_hash, $ad_state, false);
+            $ads_obj->modify_ad(trim($ad_id), trim($ad_title), $ad_desc, $ad_category, $ad_price, $ad_hash, $ad_state, false);
             exit("OK");
         } else {
             exit("Internal server error.");
         }
     }
     
-    $ads_obj->modify_ad($ad_id, $ad_title, $ad_desc, $ad_category, $ad_price, null, $ad_state, true);
+    $ads_obj->modify_ad(trim($ad_id), trim($ad_title), $ad_desc, $ad_category, $ad_price, null, $ad_state, true);
     echo "OK";
     exit;
 }
