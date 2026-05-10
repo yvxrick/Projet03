@@ -1,16 +1,3 @@
-<?php
-require_once "../app/database/annonces.php";
-require_once "../app/database/user.php";
-require_once "../app/functions/session_manager.php";
-require "./navbars/navigation_signed_in.php";
-logout_if_no_session();
-$ad_id = $_GET["id"];
-$ads_obj = new annonces();
-$ad = $ads_obj->get_ad($ad_id);
-$ad_author_email = $ad["Courriel"];
-$user_obj = new user($ad_author_email);
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -28,8 +15,22 @@ $user_obj = new user($ad_author_email);
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://projet03-wserveur.alwaysdata.net/private/css/style.css?v=22" rel="stylesheet">
+    <link href="https://projet03-wserveur.alwaysdata.net/private/css/style.css?v=2" rel="stylesheet">
 </head>
+
+<?php
+require_once "../app/database/annonces.php";
+require_once "../app/database/user.php";
+require_once "../app/functions/session_manager.php";
+require "./navbars/navigation_signed_in.php";
+require "../app/functions/phone_number_fomarting.php";
+logout_if_no_session();
+$ad_id = $_GET["id"];
+$ads_obj = new annonces();
+$ad = $ads_obj->get_ad($ad_id);
+$ad_author_email = $ad["Courriel"];
+$user_obj = new user($ad_author_email);
+?>
 
 <?php
 if ($ad == null) {
@@ -45,6 +46,10 @@ $ad_price = number_format($ad["Prix"], 2, ".") . " $";
 $ad_date_added = $ad["Parution"];
 $ad_date_modified = $ad["MiseAJour"];
 $ad_photo = $ad["Photo"];
+
+$maison_num = formatPhoneNumber($user_obj->get_tel_maison());
+$travail_num = formatPhoneNumber($user_obj->get_tel_travail());
+$cell_num = formatPhoneNumber($user_obj->get_tel_cellulaire());
 
 $show_maison_number = $user_obj->get_house_number_visibility() == "P" ? true : false;
 $show_travail_number = $user_obj->get_work_number_visibility() == "P" ? true : false;
@@ -86,13 +91,15 @@ $has_contact_info = $show_maison_number || $show_travail_number || $show_cell_nu
                             </p>
                         <?php endif; ?>
                     </div>
-                    <hr>
                     <div class="contact-info">
                         <?php if ($has_contact_info): ?>
+                            <hr>
                             <strong>Informations de contact</strong>
-                            <?php if ($show_maison_number == true): ?>
-                                <p>Numéro de téléphone: <?php echo $user_obj->get_tel_maison(); ?> </p>
-                            <?php endif; ?>
+                            <?php
+                            if ($show_maison_number) echo "<p> Numéro de maison: <strong> $maison_num </strong> </p>";
+                            if ($show_travail_number) echo "<p> Numéro de travail: <strong> $travail_num </strong> </p>";
+                            if ($show_cell_number) echo "<p> Numéro de cellulaire: <strong> $cell_num </strong> </p>";
+                            ?>
                         <?php endif; ?>
                     </div>
                     <div class="mt-auto">

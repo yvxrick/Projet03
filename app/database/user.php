@@ -66,7 +66,7 @@ class user {
      */
     public function get_statut() {
         if ($this->exists()) {
-            return $this->con->query(sprintf("SELECT Statut FROM utilisateurs WHERE Courriel = '%s'", $this->email))->fetch_row()[0];
+            return intval($this->con->query(sprintf("SELECT Statut FROM utilisateurs WHERE Courriel = '%s'", $this->email))->fetch_row()[0]);
         }
         return false;
     }

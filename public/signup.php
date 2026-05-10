@@ -32,10 +32,10 @@ require "footers/footer.php";
             <input onkeyup="validateEmail()" class="form-control" id="email-confirm" name="email-confirm" type="email"
                 placeholder="Confirmer votre courriel">
             <label>Mot de passe</label>
-            <input onkeyup="validePassword()" class="form-control" type="password" id="password" name="password"
+            <input onkeyup="validatePassword()" class="form-control" type="password" id="password" name="password"
                 placeholder="Mot de passe">
             <label>Confirmer votre mot de passe</label>
-            <input class="form-control" type="password" id="password-confirm"
+            <input onkeyup="validatePassword()" class="form-control" type="password" id="password-confirm"
                 placeholder="Confirmer votre mot de passe">
             <div hidden="true" id="invalid-password" class="invalid-fields">
                 <label>Le mot de passe doit respecter les contraintes suivantes:
@@ -43,10 +43,10 @@ require "footers/footer.php";
                         <li>Doit contenir 5 à 15 caractères</li>
                         <li>Doit contenir au moins un caractère minuscule et majuscule</li>
                         <li>Doit contenir au moins un chiffre</li>
-                        <li>Les mots de passes doivent être identiques</li>
                     </ul>
                 </label>
             </div>
+            <label hidden class="invalid-fields" id="password-not-identical">Les mots de passes doivent être identiques</label>
             <input id="sign-up-button" onclick="sendForm()" type="button" class="btn btn-primary" value="S'inscrire">
         </div>
     </form>
@@ -55,6 +55,7 @@ require "footers/footer.php";
         let email_match = false, passwd_valide = false;
         let err_passwd = document.getElementById("invalid-password")
         let err_format_email = document.getElementById("invalid-email")
+        let password_not_identical = document.getElementById("password-not-identical")
 
         function validateEmail() {
             let regex_email = /^[\w\-\.]+@([\w-]+\.)+[\w-]{2,}$/
@@ -81,14 +82,22 @@ require "footers/footer.php";
                 }
             }
         }
-        function validePassword() {
+        function validatePassword() {
             let regex_passwd = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{5,15}$/
             let passwd = document.getElementById("password").value
             let passwd_confirm = document.getElementById("password-confirm").value
 
-            passwd_valide = regex_passwd.test(passwd)
+            if (passwd_confirm.trim() == "") return;
 
+            passwd_valide = regex_passwd.test(passwd)
             err_passwd.hidden = passwd_valide
+            
+            if (passwd_valide && passwd != passwd_confirm) {
+                password_not_identical.hidden = false
+                err_passwd.hidden = true
+            } else {
+                password_not_identical.hidden = true
+            }
         }
 
         function sendForm() {
@@ -104,12 +113,12 @@ require "footers/footer.php";
                 err_passwd.hidden = false
                 canSendForm = false
             }
-            if (passwd != passwd_confirm) {
+            if (passwd != passwd_confirm && passwd_confirm != "") {
                 canSendForm = false;
-                err_passwd.hidden = false; 
-            } else {
-                err_passwd.hidden = true
+                password_not_identical.hidden = false
             }
+                
+            
 
 
             if (canSendForm) {

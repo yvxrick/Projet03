@@ -2,6 +2,9 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . "app/database/user.php";
 $login_page_link = "https://projet03-wserveur.alwaysdata.net/index.php?p=login";
 session_start(); // Starts session globally.
+if (!empty($_SESSION)) {
+    $user_obj = new user($_SESSION["email"]);
+}
 /**
  * Logs out a user by destroying his session.
  * @return bool
@@ -100,6 +103,7 @@ function can_access_page($id_to_access) {
  * @return bool
  */
 function is_admin() {
-    $statut = $_SESSION["statut"];
+    global $user_obj;
+    $statut = $user_obj->get_statut();
     return $statut === 1;
 }

@@ -173,12 +173,12 @@
     }
 
 .view_ad {
-    height: 450px;
+    height: 550px;
 }
 
 .view_ad img {
     width: 100%;
-    height: 450px;
+    height: 550px;
     object-fit: cover;
     display: block;
 }
