@@ -24,5 +24,8 @@ function formatPhoneNumber($phoneNumber) {
         $phoneNumber = $nextThree.'-'.$lastFour;
     }
 
+    if (empty($phoneNumber) || trim($phoneNumber) == "") {
+        return "N/A";
+    }
     return $phoneNumber;
 }

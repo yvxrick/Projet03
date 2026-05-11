@@ -16,8 +16,13 @@ function make_pagination_annonces($num_total_pages)
     } else {
         for ($i = 0; $i < 5; $i++) {
             $n = $i + 1;
-            $n == $current_page ? $pagination .= "<input class='btn btn-secondary active' type='button' value='$n' onclick='setPage($n, true)'>" : $pagination .= "<input class='btn btn-secondary' type='button' value='$n' onclick='setPage($n, true)'>";
+            if ($i != 4) {
+                $n == $current_page ? $pagination .= "<input class='btn btn-secondary active' type='button' value='$n' onclick='setPage($n, true)'>" : $pagination .= "<input class='btn btn-secondary' type='button' value='$n' onclick='setPage($n, true)'>";
+            }
             if ($i == 4) {
+                if ($current_page > $i && $current_page != $num_total_pages) {
+                    $pagination .= "<input class='btn btn-secondary active' type='button' value='$current_page' onclick='setPage($current_page, true)'>";
+                }
                 $current_page == $num_total_pages ? $pagination .= "<input class='btn btn-secondary active' type='button' value='$num_total_pages' onclick='setPage($num_total_pages, true)'>" : $pagination .= "<input class='btn btn-secondary' type='button' value='$num_total_pages' onclick='setPage($num_total_pages, true)'>";
             }
         }   

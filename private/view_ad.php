@@ -1,3 +1,9 @@
+<?php
+require_once "../app/database/annonces.php";
+$ad_id = $_GET["id"];
+$ads_obj = new annonces();
+$ad = $ads_obj->get_ad($ad_id);
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -19,15 +25,13 @@
 </head>
 
 <?php
-require_once "../app/database/annonces.php";
 require_once "../app/database/user.php";
 require_once "../app/functions/session_manager.php";
 require "./navbars/navigation_signed_in.php";
 require "../app/functions/phone_number_fomarting.php";
+$email = $_SESSION["email"];
 logout_if_no_session();
-$ad_id = $_GET["id"];
-$ads_obj = new annonces();
-$ad = $ads_obj->get_ad($ad_id);
+redirect_if_no_profile($email);
 $ad_author_email = $ad["Courriel"];
 $user_obj = new user($ad_author_email);
 ?>
@@ -47,9 +51,10 @@ $ad_date_added = $ad["Parution"];
 $ad_date_modified = $ad["MiseAJour"];
 $ad_photo = $ad["Photo"];
 
-$maison_num = formatPhoneNumber($user_obj->get_tel_maison());
-$travail_num = formatPhoneNumber($user_obj->get_tel_travail());
-$cell_num = formatPhoneNumber($user_obj->get_tel_cellulaire());
+$maison_num = @formatPhoneNumber($user_obj->get_tel_maison());
+$travail_num = @formatPhoneNumber($user_obj->get_tel_travail());
+$cell_num = @formatPhoneNumber($user_obj->get_tel_cellulaire());
+
 
 $show_maison_number = $user_obj->get_house_number_visibility() == "P" ? true : false;
 $show_travail_number = $user_obj->get_work_number_visibility() == "P" ? true : false;

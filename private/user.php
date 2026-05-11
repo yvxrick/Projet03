@@ -25,7 +25,10 @@ if ($page <= 0 || !is_numeric($page)) {
 }
 
 
-$num_ads_page = $_GET["num_ads"] ?? 5;
+$num_ads_page = @intval($_GET["num_ads"]) ?? 5;
+if (!is_int($num_ads_page) || $num_ads_page <= 0) {
+    $num_ads_page = 5;
+}
 $offset = intval($page - 1) * intval($num_ads_page);
 
 $user_email = $_SESSION["email"];
@@ -41,52 +44,22 @@ $user_obj = new user($user_email);
 $user_fname = $user_obj->get_prenom();
 $user_lname = $user_obj->get_nom();
 
-$ads = $ads_obj->get_all_cards_ads($num_ads_page, $offset);
-$nb_pages = ceil($ads_obj->get_number_of_ads_active() / $num_ads_page);
-
 // Sorting section
-$SORT = $_GET["sort"] ?? null;
-$ORDER = $_GET["order"] ?? null;
-$date_begin = $_GET["date_begin"] ?? null;
-$date_end = $_GET["date_end"] ?? null;
-$author_name = $_GET["author_name"] ?? null;
+error_reporting(E_ERROR);
+$SORT = htmlspecialchars($_GET["sort"], ENT_QUOTES) ?? null;
+$ORDER = htmlspecialchars($_GET["order"], ENT_QUOTES) ?? null;
 
+// Search motor
+$date_begin = htmlspecialchars($_GET["date_begin"], ENT_QUOTES) ?? null;
+$date_end = htmlspecialchars($_GET["date_end"], ENT_QUOTES) ?? null;
+$author_name = htmlspecialchars($_GET["author_name"], ENT_QUOTES) ?? null;
+$categorie = htmlspecialchars($_GET["categorie"], ENT_QUOTES) ?? null;
+$description = htmlspecialchars($_GET["desc"], ENT_QUOTES) ?? null;
+error_reporting(E_ALL);
 
-
-$SORTINGS = [
-    "date_paru" => [
-        "asc" => "sortByDDP_ASC",
-        "desc" => "sortByDDP_DESC"
-    ],
-    "fname" => [
-        "asc" => "sortByFNAME_ASC",
-        "desc" => "sortByFNAME_DESC"
-    ],
-    "lname" => [
-        "asc" => "sortByLNAME_ASC",
-        "desc" => "sortByLNAME_DESC"
-    ],
-    "categorie" => [
-        "asc" => "sortByCategorie_ASC",
-        "desc" => "sortByCategorie_DESC"
-    ] 
-];
-
-$filters = [
-    "date" => ["begin" => $date_begin, "end" => $date_end],
-    "author" => ["name" => $author_name]
-];
-$ads = $ads_obj->sortByDDP_DESC($num_ads_page, $offset); // Default sorting
-
-$selected_sort = $SORTINGS[$SORT][$ORDER] ?? null;
-if ($selected_sort) {
-    $ads = $ads_obj->$selected_sort($num_ads_page, $offset);
-}
-
-$cards = $ads_obj->load_cards_ads_html($ads);
-
-
-
+$ads = $ads_obj->set_ads_sort([$SORT, $ORDER], [$date_begin, $date_end], [$author_name], [$categorie], [$description], $num_ads_page, $offset);
+$cards = $ads_obj->load_cards_ads_html($ads[0]);
+$nb_pages = ceil($ads[1] / $num_ads_page);
 ?>
 
 
@@ -151,8 +124,29 @@ $cards = $ads_obj->load_cards_ads_html($ads);
                         Auteur
                     </button>
                     <ul class="dropdown-menu">
-                        <input onchange="setSortBy_AuthorName()" id="author_name" type="text">
+                        <input onchange="setSortBy_AuthorName()" id="author_name" type="text" placeholder="Nom de l'auteur">
                         <input onclick="setSortBy_AuthorName(true)" type="button" class="btn btn-secondary" value="Retirer" style="margin-top: 5%;">
+                    </ul>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        Catégorie
+                    </button>
+                    <ul class="dropdown-menu">
+                        <input onchange="setSortBy_Categorie_MOTOR()" id="categorie_name" type="text" placeholder="Catégorie">
+                        <input onclick="setSortBy_Categorie_MOTOR(true)" type="button" class="btn btn-secondary" value="Retirer" style="margin-top: 5%;">
+                    </ul>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        Description
+                    </button>
+                    <ul class="dropdown-menu">
+                        <textarea id="description" placeholder="Description (max: 50 charactères)" maxlength="50" style="max-height: 100px; min-height: 70px;"></textarea>
+                        <div style="display: flex; gap: 5px; margin-top: 5%">
+                            <input class="btn btn-secondary" onclick="setSortBy_Description()" type="button" value="Go">
+                            <input onclick="setSortBy_Description(true)" type="button" class="btn btn-secondary" value="Retirer">
+                        </div>
                     </ul>
                 </div>
             </div>
@@ -205,7 +199,6 @@ $cards = $ads_obj->load_cards_ads_html($ads);
                 ORDER == "asc" ? categorie_tag.innerText = "Par catégorie ↑" : categorie_tag.innerText = "Par catégorie ↓"
                 break;
         }
-        
 
         if (URLParams.get("page") == null) { URLParams.set("page", "1"); changed = true }
         if (URLParams.get("num_ads") == null) { URLParams.set("num_ads", "5"); changed = true }
@@ -280,7 +273,32 @@ $cards = $ads_obj->load_cards_ads_html($ads);
                 location.search = URLParams
                 return;
             }
+            if (author_name.trim() == "") return;
             URLParams.set("author_name", author_name)
+            location.search = URLParams
+        }
+
+        function setSortBy_Categorie_MOTOR(removeSort) {
+            let categorie = document.getElementById("categorie_name").value
+            if (removeSort) {
+                URLParams.delete("categorie")
+                location.search = URLParams
+                return;
+            }
+            if (categorie.trim() == "") return;
+            URLParams.set("categorie", categorie)
+            location.search = URLParams
+        }
+
+        function setSortBy_Description(removeSort) {
+            let description = document.getElementById("description").value
+            if (removeSort) {
+                URLParams.delete("desc")
+                location.search = URLParams
+                return;
+            }
+            if (description.trim() == "") return;
+            URLParams.set("desc", description)
             location.search = URLParams
         }
 

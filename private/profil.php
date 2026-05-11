@@ -34,7 +34,7 @@ $no_tel_travail_public = $user_obj->get_work_number_visibility() == "P" ? true :
 $no_tel_cell_public = $user_obj->get_phone_number_visibility() == "P" ? true : false;
 ?>
 
-<body>
+<body style="background-color: rgba(0, 0, 0, 0.03);">
     <form id="form" method="post">
     <div id="container">
         <p id="header" style="text-align: center;">Mon profil</p>

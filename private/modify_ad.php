@@ -40,7 +40,7 @@ $ad_photo = $ad["Photo"];
 require "./navbars/navigation_signed_in.php";
 ?>
 
-<body>
+<body style="background-color: rgba(0, 0, 0, 0.03);">
     <form method="post" onsubmit="sendForm(event)" enctype="multipart/form-data">
         <div hidden="true" id="ad_upload_status_msg">
             <span id="msg"></span>
