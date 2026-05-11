@@ -303,7 +303,7 @@ class user {
 
     /**
      * Retorune la visibilité de numéro de maison de l'utilisateur.
-     * @return string
+     * @return string|void
      */
     public function get_house_number_visibility() {
         $query = sprintf("SELECT NoTelMaison FROM utilisateurs WHERE Courriel = '%s'", $this->email);
@@ -314,7 +314,7 @@ class user {
 
     /**
      * Retorune la visibilité de numéro de travail de l'utilisateur.
-     * @return string
+     * @return string|void
      */
     public function get_work_number_visibility() {
         $query = sprintf("SELECT NoTelTravail FROM utilisateurs WHERE Courriel = '%s'", $this->email);
@@ -325,7 +325,7 @@ class user {
 
     /**
      * Retorune la visibilité de numéro de cellulaire de l'utilisateur.
-     * @return string
+     * @return string|void
      */
     public function get_phone_number_visibility() {
         $query = sprintf("SELECT NoTelCellulaire FROM utilisateurs WHERE Courriel = '%s'", $this->email);
