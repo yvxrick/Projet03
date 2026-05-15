@@ -51,9 +51,9 @@ $ad_date_added = $ad["Parution"];
 $ad_date_modified = $ad["MiseAJour"];
 $ad_photo = $ad["Photo"];
 
-$maison_num = @formatPhoneNumber($user_obj->get_tel_maison());
-$travail_num = @formatPhoneNumber($user_obj->get_tel_travail());
-$cell_num = @formatPhoneNumber($user_obj->get_tel_cellulaire());
+$maison_num = formatPhoneNumber($user_obj->get_tel_maison()) ?? "N/A";
+$travail_num = formatPhoneNumber($user_obj->get_tel_travail()) ?? "N/A";
+$cell_num = formatPhoneNumber($user_obj->get_tel_cellulaire()) ?? "N/A";
 
 
 $show_maison_number = $user_obj->get_house_number_visibility() == "P" ? true : false;

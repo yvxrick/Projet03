@@ -40,16 +40,19 @@ $no_tel_cell_public = $user_obj->get_phone_number_visibility() == "P" ? true : f
         <p id="header" style="text-align: center;">Mon profil</p>
         <p>Statut d'employé</p> <?php echo make_status($user_obj->get_statut()) ?>
         <p>No. d'employé</p> <input name="no-employe" class="form-control" style="width: 100px;" type="number" value="<?php echo $no_empl ?>">
-        <p>Nom de famille <span id="required">*</span> </p> <input id="nom-famille" name="nom-famille" class="form-control" style="width: 250px; margin-bottom: 0px;" type="text" value="<?php echo $lname ?>">
+        <p>Nom de famille <span id="required">*</span> </p> <input placeholder="Nom de famille" id="nom-famille" name="nom-famille" class="form-control" style="width: 250px; margin-bottom: 0px;" type="text" value="<?php echo $lname ?>">
         <label hidden="true" id="err_lname" class="invalid-fields">Veuillez entrer votre nom de famille</label>
 
-        <p>Prénom <span id="required">*</span> </p> <input id="prenom" name="prenom"class="form-control" style="width: 250px; margin-bottom: 0px;" type="text" value="<?php echo $fname ?>">
+        <p>Prénom <span id="required">*</span> </p> <input placeholder="Prénom" id="prenom" name="prenom"class="form-control" style="width: 250px; margin-bottom: 0px;" type="text" value="<?php echo $fname ?>">
         <label hidden="true" id="err_fname" class="invalid-fields">Veuillez entrer votre prénom</label>
 
         <p>Courriel</p> <input name="courriel" disabled class="form-control" style="width: 250px;" type="text" value="<?php echo $courriel ?>">
-        <p>Téléphone à la maison</p> <input id="tel-maison" name="tel-maison" class="form-control" style="width: 250px;" type="text" value="<?php echo $no_tel_maison?>">
-        <p>Téléphone au travail</p> <input id="tel-travail" name="tel-travail" class="form-control" style="width: 250px;" type="text" value="<?php echo $no_tel_travail ?>">
-        <p>Téléphone cellulaire</p> <input id="tel-cell=" name="tel-cell" class="form-control" style="width: 250px;" type="text" value="<?php echo $no_tel_cell ?>">
+        <p>Téléphone à la maison</p> <input placeholder="Facultatif" id="tel-maison" name="tel-maison" class="form-control" style="width: 250px;" type="text" value="<?php echo $no_tel_maison?>">
+        <label hidden="true" id="err_num_maison" class="invalid-fields">Veuillez entrer un numéro de téléphone valide</label>
+        <p>Téléphone au travail</p> <input placeholder="Facultatif" id="tel-travail" name="tel-travail" class="form-control" style="width: 250px;" type="text" value="<?php echo $no_tel_travail ?>">
+        <label hidden="true" id="err_num_travail" class="invalid-fields">Veuillez entrer un numéro de téléphone valide</label>
+        <p>Téléphone cellulaire</p> <input placeholder="Facultatif" id="tel-cell" name="tel-cell" class="form-control" style="width: 250px;" type="text" value="<?php echo $no_tel_cell ?>">
+        <label hidden="true" id="err_num_cell" class="invalid-fields">Veuillez entrer un numéro de téléphone valide</label>
         <div>
             Informations de contact publiques:
             <br>
@@ -64,24 +67,44 @@ $no_tel_cell_public = $user_obj->get_phone_number_visibility() == "P" ? true : f
     <script>
         let canSendForm = true;
         let btn_send = document.getElementById("btn-send")
+        let regExPhoneNumber = /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$/
+
+        let err_lname = document.getElementById("err_lname");
+        let err_fname = document.getElementById("err_fname");
+        let err_num_maison = document.getElementById("err_num_maison")
+        let err_num_travail = document.getElementById("err_num_travail")
+        let err_num_cell = document.getElementById("err_num_cell")
+
         function validateForm() {
-            // a mettre statut empl qui sera une liste déroulante
             let nom_famille = document.getElementById("nom-famille");
             let prenom = document.getElementById("prenom");
-            let err_lname = document.getElementById("err_lname");
-            let err_fname = document.getElementById("err_fname");
+
+            // telephones
+            let num_maison = document.getElementById("tel-maison").value
+            let num_travail = document.getElementById("tel-travail").value
+            let num_cel = document.getElementById("tel-cell").value
 
             err_lname.hidden = nom_famille.value.trim() != ""
             err_fname.hidden = prenom.value.trim() != ""
-            canSendForm = nom_famille.value.trim() !== "" && prenom.value.trim() !== ""
+            canSendForm = nom_famille.value.trim() !== "" && prenom.value.trim() !== "" && 
+                        !(regExPhoneNumber.test(num_maison) == false && num_maison.trim() != "") &&
+                        !(regExPhoneNumber.test(num_travail) == false && num_travail.trim() != "") &&
+                        !(regExPhoneNumber.test(num_cel) == false && num_cel.trim() != "")
+
+            err_num_maison.hidden = !(regExPhoneNumber.test(num_maison) == false && num_maison.trim() != "")
+            err_num_travail.hidden = !(regExPhoneNumber.test(num_travail) == false && num_travail.trim() != "")
+            err_num_cell.hidden = !(regExPhoneNumber.test(num_cel) == false && num_cel.trim() != "")
+    
             if (canSendForm) {sendForm();}
         }
+
         function sendForm() {
             // a mettre statut empl
             btn_send.disabled = true;
             btn_send.value = "En cours d'enregistrement...";
             document.getElementById("form").submit()
         }
+
     </script>
 </body>
 </html>

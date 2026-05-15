@@ -12,6 +12,7 @@
 <?php
 $page = basename(__FILE__, ".php");
 require_once "../app/functions/session_manager.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "app/functions/helper_functions.php";
 require_once "../app/database/user.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "app/database/annonces.php";
 require "./navbars/navigation_signed_in.php";
@@ -22,7 +23,7 @@ logout_if_no_session();
 
 $page = $_GET["page"] ?? 1;
 $num_ads_page = 10; // always 10 ads
-if ($page == "NaN") {$page = 1;}
+if ($page == "NaN" || !is_numeric($page)) {$page = 1;}
 $offset = ($page - 1) * $num_ads_page;
 
 $user_email = $_SESSION["email"];
@@ -31,10 +32,10 @@ $user_id = $user_obj->get_id();
 $ads_obj = new annonces();
 
 // Sorting
-error_reporting(E_ERROR);
-$SORT = htmlspecialchars($_GET["sort"], ENT_QUOTES) ?? null;
-$ORDER = htmlspecialchars($_GET["order"], ENT_QUOTES) ?? null;
-error_reporting(E_ALL);
+
+$SORT = h_hsc($_GET["sort"] ?? null, ENT_QUOTES);
+$ORDER = h_hsc($_GET["order"] ?? null, ENT_QUOTES);
+
 
 $users_ads = $ads_obj->set_ads_sort_user($user_id, [$SORT, $ORDER], $offset);
 $nb_pages = ceil($users_ads[1] / $num_ads_page);

@@ -1,5 +1,6 @@
 <?php
 function formatPhoneNumber($phoneNumber) {
+    if ($phoneNumber == null) {return null;}
     $phoneNumber = preg_replace('/[^0-9]/','',$phoneNumber);
 
     if(strlen($phoneNumber) > 10) {

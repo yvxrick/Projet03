@@ -16,16 +16,17 @@ $page = basename(__FILE__, ".php");
 require_once "../app/functions/session_manager.php";
 require_once "../app/database/user.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "app/database/annonces.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "app/functions/helper_functions.php";
 if (!is_admin()) require "./navbars/navigation_signed_in.php";
 require "../app/functions/pagination.php";
 
-$page = $_GET["page"] ?? null;
+$page = intval($_GET["page"] ?? null);
 if ($page <= 0 || !is_numeric($page)) {
     $page = 1;
 }
 
 
-$num_ads_page = @intval($_GET["num_ads"]) ?? 5;
+$num_ads_page = intval($_GET["num_ads"] ?? null);
 if (!is_int($num_ads_page) || $num_ads_page <= 0) {
     $num_ads_page = 5;
 }
@@ -45,17 +46,15 @@ $user_fname = $user_obj->get_prenom();
 $user_lname = $user_obj->get_nom();
 
 // Sorting section
-error_reporting(E_ERROR);
-$SORT = htmlspecialchars($_GET["sort"], ENT_QUOTES) ?? null;
-$ORDER = htmlspecialchars($_GET["order"], ENT_QUOTES) ?? null;
+$SORT = h_hsc($_GET["sort"] ?? "date_paru", ENT_QUOTES);
+$ORDER = h_hsc($_GET["order"] ?? "desc", ENT_QUOTES);
 
 // Search motor
-$date_begin = htmlspecialchars($_GET["date_begin"], ENT_QUOTES) ?? null;
-$date_end = htmlspecialchars($_GET["date_end"], ENT_QUOTES) ?? null;
-$author_name = htmlspecialchars($_GET["author_name"], ENT_QUOTES) ?? null;
-$categorie = htmlspecialchars($_GET["categorie"], ENT_QUOTES) ?? null;
-$description = htmlspecialchars($_GET["desc"], ENT_QUOTES) ?? null;
-error_reporting(E_ALL);
+$date_begin = h_hsc($_GET["date_begin"] ?? null, ENT_QUOTES);
+$date_end = h_hsc($_GET["date_end"] ?? null, ENT_QUOTES);
+$author_name = h_hsc($_GET["author_name"] ?? null, ENT_QUOTES);
+$categorie = h_hsc($_GET["categorie"] ?? null, ENT_QUOTES);
+$description = h_hsc($_GET["desc"] ?? null, ENT_QUOTES);
 
 $ads = $ads_obj->set_ads_sort([$SORT, $ORDER], [$date_begin, $date_end], [$author_name], [$categorie], [$description], $num_ads_page, $offset);
 $cards = $ads_obj->load_cards_ads_html($ads[0]);

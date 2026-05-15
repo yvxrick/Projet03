@@ -1,6 +1,6 @@
 <?php
 function make_status($statut_num) {
-    $HTML = "<select class='form-control' style='margin-bottom: 10px;' name='statut'>";
+    $HTML = "<select style='width: 200px; margin-bottom: 10px;' class='form-control' name='statut'>";
     if ($statut_num == 1) {
         $HTML .= "<option selected value='1'> Administrateur </option>";
     } else {$HTML .= "<option value='1'> Administrateur </option>";}
@@ -20,5 +20,6 @@ function make_status($statut_num) {
     if ($statut_num == 5) {
         $HTML .= "<option selected value='5'> Professionnel </option>";
     } else {$HTML .= "<option value='5'> Professionnel </option>";}
+    $HTML .= "</select>";
     return $HTML;
 }
