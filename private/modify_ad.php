@@ -120,7 +120,7 @@ require "./navbars/navigation_signed_in.php";
                 body: formData
             }).then((response) => response.text())
                 .then((response) => getResponse(response))
-            .finally(() => {btn_send.disabled = false; btn_send.value = "Mettre à jour mon annonce ↑"})
+            .finally(() => {btn_send.value = "Annonce mis à jour"; })
 
 
         }

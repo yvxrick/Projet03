@@ -48,11 +48,11 @@ $no_tel_cell_public = $user_obj->get_phone_number_visibility() == "P" ? true : f
 
         <p>Courriel</p> <input name="courriel" disabled class="form-control" style="width: 250px;" type="text" value="<?php echo $courriel ?>">
         <p>Téléphone à la maison</p> <input placeholder="Facultatif" id="tel-maison" name="tel-maison" class="form-control" style="width: 250px;" type="text" value="<?php echo $no_tel_maison?>">
-        <label hidden="true" id="err_num_maison" class="invalid-fields">Veuillez entrer un numéro de téléphone valide</label>
+        <label style="margin: 0px;" hidden="true" id="err_num_maison" class="invalid-fields">Veuillez entrer un numéro de téléphone valide</label>
         <p>Téléphone au travail</p> <input placeholder="Facultatif" id="tel-travail" name="tel-travail" class="form-control" style="width: 250px;" type="text" value="<?php echo $no_tel_travail ?>">
-        <label hidden="true" id="err_num_travail" class="invalid-fields">Veuillez entrer un numéro de téléphone valide</label>
+        <label style="margin: 0px;" hidden="true" id="err_num_travail" class="invalid-fields">Veuillez entrer un numéro de téléphone valide</label>
         <p>Téléphone cellulaire</p> <input placeholder="Facultatif" id="tel-cell" name="tel-cell" class="form-control" style="width: 250px;" type="text" value="<?php echo $no_tel_cell ?>">
-        <label hidden="true" id="err_num_cell" class="invalid-fields">Veuillez entrer un numéro de téléphone valide</label>
+        <label style="margin: 0px;" hidden="true" id="err_num_cell" class="invalid-fields">Veuillez entrer un numéro de téléphone valide</label>
         <div>
             Informations de contact publiques:
             <br>
@@ -67,7 +67,7 @@ $no_tel_cell_public = $user_obj->get_phone_number_visibility() == "P" ? true : f
     <script>
         let canSendForm = true;
         let btn_send = document.getElementById("btn-send")
-        let regExPhoneNumber = /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$/
+        let regExPhoneNumber = /^\+?[0-9]{0,3}\W?\(?[0-9]{3}\)?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/
 
         let err_lname = document.getElementById("err_lname");
         let err_fname = document.getElementById("err_fname");
