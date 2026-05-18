@@ -1,19 +1,35 @@
 <?php
 /**
- * Fait la pagination pour le menu principal des annonces.
- * @param int $nb_pages
+ * Fait la pagination pour le menu principal des annonces. Limite de 5 pages.
+ * @param int $num_total_pages Le nombre total de pages
  * @return void
  */
-function make_pagination_annonces($nb_pages)
+function make_pagination_annonces($num_total_pages)
 {
     $current_page = $_GET["page"] ?? null;
     $current_page == 1 ? $pagination = "<input class='btn btn-secondary' disabled type='button' value='<' onclick='setPage(-1, false)'>" : $pagination = "<input class='btn btn-secondary' type='button' value='<' onclick='setPage(-1, false)'>";
-    for ($i = 0; $i <= $nb_pages; $i++) {
-        $n = $i + 1;
-        $n == $current_page ? $pagination .= "<input class='btn btn-secondary active' type='button' value='$n' onclick='setPage($n, true)'>" : $pagination .= "<input class='btn btn-secondary' type='button' value='$n' onclick='setPage($n, true)'>";
+    if ($num_total_pages <= 5) {
+        for ($i = 0; $i < $num_total_pages; $i++) {
+            $n = $i + 1;
+            $n == $current_page ? $pagination .= "<input class='btn btn-secondary active' type='button' value='$n' onclick='setPage($n, true)'>" : $pagination .= "<input class='btn btn-secondary' type='button' value='$n' onclick='setPage($n, true)'>";
+        }
+    } else {
+        for ($i = 0; $i < 5; $i++) {
+            $n = $i + 1;
+            if ($i != 4) {
+                $n == $current_page ? $pagination .= "<input class='btn btn-secondary active' type='button' value='$n' onclick='setPage($n, true)'>" : $pagination .= "<input class='btn btn-secondary' type='button' value='$n' onclick='setPage($n, true)'>";
+            }
+            if ($i == 4) {
+                if ($current_page > $i && $current_page != $num_total_pages) {
+                    $pagination .= "<input class='btn btn-secondary active' type='button' value='$current_page' onclick='setPage($current_page, true)'>";
+                }
+                $current_page == $num_total_pages ? $pagination .= "<input class='btn btn-secondary active' type='button' value='$num_total_pages' onclick='setPage($num_total_pages, true)'>" : $pagination .= "<input class='btn btn-secondary' type='button' value='$num_total_pages' onclick='setPage($num_total_pages, true)'>";
+            }
+        }   
     }
 
-    $current_page == $nb_pages + 1 ? $pagination .= "<input class='btn btn-secondary' disabled type='button' value='>' onclick='setPage(1, false)'>" : $pagination .= "<input class='btn btn-secondary' type='button' value='>' onclick='setPage(1, false)'>";
+    $current_page == $num_total_pages ? $pagination .= "<input class='btn btn-secondary' disabled type='button' value='>' onclick='setPage(1, false)'>" : $pagination .= "<input class='btn btn-secondary' type='button' value='>' onclick='setPage(1, false)'>";
+    $pagination .= "<input id='specific_page' onchange='setSpecificPage()' style='width: 100px; font-size: 12px;' type='text' placeholder='Page spécifique'>";
     echo $pagination;
     echo '<script> function setPage(page, specific) {
             if (specific) {
@@ -24,5 +40,12 @@ function make_pagination_annonces($nb_pages)
             p = parseInt(URLParams.get("page")) + page
             URLParams.set("page", p)
             location.search = URLParams
-        } </script>';
+        } 
+        function setSpecificPage() {
+            let p = parseInt(document.getElementById("specific_page").value)
+            if (isNaN(p)) {alert("Veuillez entrer une numéro de page valide."); return;}
+            URLParams.set("page", p)
+            location.search = URLParams
+        }
+        </script>';
 }

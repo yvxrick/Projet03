@@ -6,14 +6,22 @@ $profil = "https://projet03-wserveur.alwaysdata.net/private/profil.php";
 
 <div id="navbar">
     <ul>
-        <li><a href='https://projet03-wserveur.alwaysdata.net/private/logout.php'>Déconnexion</a></li>
-        <li class='<?php echo page_active("profil", $page) ?>'><a href='<?php echo $profil ?>'>Profil</a></li>
-        <li class='<?php echo page_active("add_ad", $page)?>'><a href='https://projet03-wserveur.alwaysdata.net/private/add_ad.php'>Ajouter une annonce</a></li>
         <li class='<?php echo page_active("user", $page)?>'><a href='https://projet03-wserveur.alwaysdata.net/private/index.php?page=1&num_ads=5'>Menu principal</a></li>
+        <li class='<?php echo page_active("add_ad", $page)?>'><a href='https://projet03-wserveur.alwaysdata.net/private/add_ad.php'>Ajouter une annonce</a></li>
+        <li class='<?php echo page_active("my_ads", $page) ?>'><a href="https://projet03-wserveur.alwaysdata.net/private/my_ads.php">Mes annonces</a></li>
+        <li class='<?php echo page_active("profil", $page) ?>'><a href='<?php echo $profil ?>'>Profil</a></li>
+        <li style="float: right;"><a href='https://projet03-wserveur.alwaysdata.net/private/logout.php'>Déconnexion</a></li>
     </ul>
 </div>
 
+
+
 <style>
+    ul {
+        padding: 0;
+        margin: 0;
+    }
+
     #navbar {
         overflow: hidden;
         background-color: #333333;
@@ -21,7 +29,7 @@ $profil = "https://projet03-wserveur.alwaysdata.net/private/profil.php";
     }
 
     #navbar ul li {
-        float: right;
+        float: left;
         list-style-type: none;
     }
 

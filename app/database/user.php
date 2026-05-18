@@ -1,5 +1,8 @@
 <?php
 require_once "database.php";
+/**
+ * Classe utilitaires pour gérer tout ce qui touche les utilisateurs.
+ */
 class user {
     /**
      * Connection à la base de donnée
@@ -63,7 +66,7 @@ class user {
      */
     public function get_statut() {
         if ($this->exists()) {
-            return $this->con->query(sprintf("SELECT Statut FROM utilisateurs WHERE Courriel = '%s'", $this->email))->fetch_row()[0];
+            return intval($this->con->query(sprintf("SELECT Statut FROM utilisateurs WHERE Courriel = '%s'", $this->email))->fetch_row()[0]);
         }
         return false;
     }
@@ -103,7 +106,9 @@ class user {
      */
     public function get_tel_maison() {
         if ($this->exists()) {
-            return $this->con->query(sprintf("SELECT NoTelMaison FROM utilisateurs WHERE Courriel = '%s'", $this->email))->fetch_row()[0];
+            $num = $this->con->query(sprintf("SELECT NoTelMaison FROM utilisateurs WHERE Courriel = '%s'", $this->email))->fetch_row()[0];
+            if ($num == null) {return;}
+            return substr($num, 0, -1);
         }
         return false;
     }
@@ -113,7 +118,9 @@ class user {
      */
     public function get_tel_travail() {
         if ($this->exists()) {
-            return $this->con->query(sprintf("SELECT NoTelTravail FROM utilisateurs WHERE Courriel = '%s'", $this->email))->fetch_row()[0];
+            $num = $this->con->query(sprintf("SELECT NoTelTravail FROM utilisateurs WHERE Courriel = '%s'", $this->email))->fetch_row()[0];
+            if ($num == null) {return;}
+            return substr($num, 0, -1);
         }
         return false;
     }
@@ -122,7 +129,9 @@ class user {
      */
     public function get_tel_cellulaire() {
         if ($this->exists()) {
-            return $this->con->query(sprintf("SELECT NoTelCellulaire FROM utilisateurs WHERE Courriel = '%s'", $this->email))->fetch_row()[0];
+            $num = $this->con->query(sprintf("SELECT NoTelCellulaire FROM utilisateurs WHERE Courriel = '%s'", $this->email))->fetch_row()[0];
+            if ($num == null) {return;}
+            return substr($num, 0, -1);
         }
         return false;
     }
@@ -159,24 +168,30 @@ class user {
         return false;
     }
 
-    public function set_tel_maison($value) {
+    public function set_tel_maison($value, $public) {
         if ($this->exists()) {
+            $value = preg_replace("/[PN]$/", "", $value);
+            $public != null ? $value .= "P" : $value .= "N";
             $this->con->query(sprintf("UPDATE utilisateurs SET NoTelMaison = '%s' WHERE Courriel = '%s'", $value, $this->email));
             return true;
         }
         return false;
     }
 
-    public function set_tel_travail($value) {
+    public function set_tel_travail($value, $public) {
         if ($this->exists()) {
+            $value = preg_replace("/[PN]$/", "", $value);
+            $public != null ? $value .= "P" : $value .= "N";
             $this->con->query(sprintf("UPDATE utilisateurs SET NoTelTravail = '%s' WHERE Courriel = '%s'", $value, $this->email));
             return true;
         }
         return false;
     }
 
-    public function set_tel_cellulaire($value) {
+    public function set_tel_cellulaire($value, $public) {
         if ($this->exists()) {
+            $value = preg_replace("/[PN]$/", "", $value);
+            $public != null ? $value .= "P" : $value .= "N";
             $this->con->query(sprintf("UPDATE utilisateurs SET NoTelCellulaire = '%s' WHERE Courriel = '%s'", $value, $this->email));
             return true;
         }
@@ -266,6 +281,57 @@ class user {
         return false;
     }
 
-    
+    /**
+     * Crée un nouvel utilisateur.
+     * @param mixed $email
+     * @param mixed $password
+     * @param mixed $email_to_validate Le staut de 0, qui indique que l'utilisateur doit vérifier son courriel
+     * @param mixed $user_hash Hash unique pour chaque utilisateur.
+     * @param mixed $zero La valeur 0.
+     * @return bool
+     */
+    public function add_new_user($email, $password, $email_to_validate, $user_hash, $zero) {
+        if (!($this->exists())) {
+            $query = "INSERT INTO utilisateurs(Courriel, MotDePasse, Statut, AutresInfos, NbConnexions, Creation) VALUES (?, ?, ?, ?, ?, NOW())";
+            $stmt = $this->con->prepare($query);
+            $stmt->bind_param("ssisi", $email, $password, $email_to_validate, $user_hash, $zero);
+            $stmt->execute();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Retorune la visibilité de numéro de maison de l'utilisateur.
+     * @return string|void
+     */
+    public function get_house_number_visibility() {
+        $query = sprintf("SELECT NoTelMaison FROM utilisateurs WHERE Courriel = '%s'", $this->email);
+        $num = $this->con->query($query)->fetch_row()[0];
+        if ($num == null) {return;}
+        return substr($num, -1);
+    }
+
+    /**
+     * Retorune la visibilité de numéro de travail de l'utilisateur.
+     * @return string|void
+     */
+    public function get_work_number_visibility() {
+        $query = sprintf("SELECT NoTelTravail FROM utilisateurs WHERE Courriel = '%s'", $this->email);
+        $num = $this->con->query($query)->fetch_row()[0];
+        if ($num == null) {return;}
+        return substr($num, -1);
+    }
+
+    /**
+     * Retorune la visibilité de numéro de cellulaire de l'utilisateur.
+     * @return string|void
+     */
+    public function get_phone_number_visibility() {
+        $query = sprintf("SELECT NoTelCellulaire FROM utilisateurs WHERE Courriel = '%s'", $this->email);
+        $num = $this->con->query($query)->fetch_row()[0];
+        if ($num == null) {return;}
+        return substr($num, -1);
+    }
 
 }

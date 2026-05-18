@@ -1,7 +1,3 @@
-<?php
-require "navbars/navigation_signed_out.php";
-require "footers/footer.php";
-?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,6 +9,11 @@ require "footers/footer.php";
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://projet03-wserveur.alwaysdata.net/public/css/signup-in.css" rel="stylesheet">
 </head>
+
+<?php
+require "navbars/navigation_signed_out.php";
+require "footers/footer.php";
+?>
 
 <body>
     <form id="form" method="post">
@@ -97,7 +98,7 @@ require "footers/footer.php";
             }
             if (response === status.NOT_AUTHENTICATED) {
                 login_msg_div.style.backgroundColor = "red"
-                stauts_msg.innerHTML = "Votre compte existe, mais il n'est pas authentifié."
+                stauts_msg.innerHTML = "Votre email n'a pas été validé."
                 login_msg_div.hidden = false
                 return;
             }

@@ -7,6 +7,7 @@ class Database {
     public static function Connect() {
         try {
             $con = new mysqli("mysql-projet03-wserveur.alwaysdata.net", "projet03-wserveur", "Qwerty-01$", "projet03-wserveur_db");
+            $con->query("SET time_zone = '-04:00'");
         } catch (mysqli_sql_exception $e) {
             header("HTTP/1.0 500");
             echo "500 Internal server error.";

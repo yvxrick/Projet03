@@ -1,28 +1,9 @@
 <?php
 require_once "../app/database/annonces.php";
-require_once "../app/functions/session_manager.php";
-require "./navbars/navigation_signed_in.php";
-logout_if_no_session();
-$ads_obj = new annonces();
 $ad_id = $_GET["id"];
+$ads_obj = new annonces();
 $ad = $ads_obj->get_ad($ad_id);
-if ($ad == null) {
-    header("Location: index.php");
-    die();
-}
-$ad_img = $ad["Photo"];
-$ad_author = $ad["Prenom"] . " " .$ad["Nom"];
-$ad_title = $ad["DescriptionAbregee"];
-$ad_desc = $ad["DescriptionComplete"];
-$ad_category = $ad["Description"];
-$ad_price = number_format($ad["Prix"], 2, ".") . " $";
-$ad_date_added = $ad["Parution"];
-$ad_date_modified = $ad["MiseAJour"];
-$ad_photo = $ad["Photo"];
-
 ?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -40,19 +21,56 @@ $ad_photo = $ad["Photo"];
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://projet03-wserveur.alwaysdata.net/private/css/style.css?v=1" rel="stylesheet">
+    <link href="https://projet03-wserveur.alwaysdata.net/private/css/style.css?v=2" rel="stylesheet">
 </head>
+
+<?php
+require_once "../app/database/user.php";
+require_once "../app/functions/session_manager.php";
+require "./navbars/navigation_signed_in.php";
+require "../app/functions/phone_number_fomarting.php";
+$email = $_SESSION["email"];
+logout_if_no_session();
+redirect_if_no_profile($email);
+$ad_author_email = $ad["Courriel"];
+$user_obj = new user($ad_author_email);
+?>
+
+<?php
+if ($ad == null) {
+    header("Location: index.php");
+    die();
+}
+$ad_img = $ad["Photo"];
+$ad_author = $ad["Prenom"] . " " .$ad["Nom"];
+$ad_title = $ad["DescriptionAbregee"];
+$ad_desc = $ad["DescriptionComplete"];
+$ad_category = $ad["Description"];
+$ad_price = number_format($ad["Prix"], 2, ".") . " $";
+$ad_date_added = $ad["Parution"];
+$ad_date_modified = $ad["MiseAJour"];
+$ad_photo = $ad["Photo"];
+
+$maison_num = formatPhoneNumber($user_obj->get_tel_maison()) ?? "N/A";
+$travail_num = formatPhoneNumber($user_obj->get_tel_travail()) ?? "N/A";
+$cell_num = formatPhoneNumber($user_obj->get_tel_cellulaire()) ?? "N/A";
+
+
+$show_maison_number = $user_obj->get_house_number_visibility() == "P" ? true : false;
+$show_travail_number = $user_obj->get_work_number_visibility() == "P" ? true : false;
+$show_cell_number = $user_obj->get_phone_number_visibility() == "P" ? true : false;
+$has_contact_info = $show_maison_number || $show_travail_number || $show_cell_number;
+?>
 
 <body style="background-color: #f5f7fa;">
 <div class="container mb-5">
 
     <div class="card shadow-sm border-0">
         <div class="row g-0">
-            <div class="col-md-6">
+            <div class="col-md-6 view_ad">
                 <img 
                     src="<?php echo "https://projet03-wserveur.alwaysdata.net/private/ads-images/$ad_photo" ?>"
-                    class="img-fluid rounded-start h-100"
-                    style="object-fit: cover;"
+                    class="rounded-start"
                 >
             </div>
             <div class="col-md-6">
@@ -76,6 +94,17 @@ $ad_photo = $ad["Photo"];
                             <p class="mb-1">
                                 <strong>Mis à jour:</strong> <?php echo $ad_date_modified ?>
                             </p>
+                        <?php endif; ?>
+                    </div>
+                    <div class="contact-info">
+                        <?php if ($has_contact_info): ?>
+                            <hr>
+                            <strong>Informations de contact</strong>
+                            <?php
+                            if ($show_maison_number) echo "<p> Numéro de maison: <strong> $maison_num </strong> </p>";
+                            if ($show_travail_number) echo "<p> Numéro de travail: <strong> $travail_num </strong> </p>";
+                            if ($show_cell_number) echo "<p> Numéro de cellulaire: <strong> $cell_num </strong> </p>";
+                            ?>
                         <?php endif; ?>
                     </div>
                     <div class="mt-auto">
