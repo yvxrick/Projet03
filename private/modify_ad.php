@@ -25,6 +25,7 @@ $ad_id = $_GET["id"] ?? null;
 $user_obj = new user($user_email);
 $ads_obj = new annonces();
 logout_if_no_session();
+redirect_if_no_profile($user_email);
 if (!$ads_obj->is_users_ad($user_id, $ad_id)) {
     require "./forbidden.html";
     exit();
