@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://projet03-wserveur.alwaysdata.net/private/css/style.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="../favicons/user.ico">
 </head>
 
 <?php
@@ -48,7 +49,16 @@ $no_tel_cell_public = $user_obj->get_phone_number_visibility() == "P" ? true : f
         <label hidden="true" id="err_fname" class="invalid-fields">Veuillez entrer votre prénom</label>
 
         <p>Courriel</p> <input name="courriel" disabled class="form-control" style="width: 250px;" type="text" value="<?php echo $courriel ?>">
-        <p>Mot de passe <span id="required">*</span> </p> <input required name="passwd" class="form-control" style="width: 250px;" type="password" value="<?=$passwd?>">
+        <p>Mot de passe <span id="required">*</span> </p> <input required name="passwd" id="passwd" class="form-control" style="width: 250px;" type="password" value="<?=$passwd?>">
+        <div hidden id="invalid-password" class="invalid-fields">
+                <label>Le mot de passe doit respecter les contraintes suivantes:
+                    <ul style="margin-left: 30px">
+                        <li>Doit contenir 5 à 15 caractères</li>
+                        <li>Doit contenir au moins un caractère minuscule et majuscule</li>
+                        <li>Doit contenir au moins un chiffre</li>
+                    </ul>
+                </label>
+            </div>
         <p>Téléphone à la maison</p> <input placeholder="Facultatif" id="tel-maison" name="tel-maison" class="form-control" style="width: 250px;" type="text" value="<?php echo $no_tel_maison?>">
         <label style="margin: 0px;" hidden="true" id="err_num_maison" class="invalid-fields">Veuillez entrer un numéro de téléphone valide</label>
         <p>Téléphone au travail</p> <input placeholder="Facultatif" id="tel-travail" name="tel-travail" class="form-control" style="width: 250px;" type="text" value="<?php echo $no_tel_travail ?>">
@@ -70,12 +80,14 @@ $no_tel_cell_public = $user_obj->get_phone_number_visibility() == "P" ? true : f
         let canSendForm = true;
         let btn_send = document.getElementById("btn-send")
         let regExPhoneNumber = /^\+?[0-9]{0,3}\W?\(?[0-9]{3}\)?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/
+        let regex_passwd = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{5,15}$/
 
         let err_lname = document.getElementById("err_lname");
         let err_fname = document.getElementById("err_fname");
         let err_num_maison = document.getElementById("err_num_maison")
         let err_num_travail = document.getElementById("err_num_travail")
         let err_num_cell = document.getElementById("err_num_cell")
+        let err_passwd = document.getElementById("invalid-password")
 
         function validateForm() {
             let nom_famille = document.getElementById("nom-famille");
@@ -86,17 +98,30 @@ $no_tel_cell_public = $user_obj->get_phone_number_visibility() == "P" ? true : f
             let num_travail = document.getElementById("tel-travail").value
             let num_cel = document.getElementById("tel-cell").value
 
+            // MotDePasse
+            let passwd = document.getElementById("passwd").value
+
             err_lname.hidden = nom_famille.value.trim() != ""
             err_fname.hidden = prenom.value.trim() != ""
             canSendForm = nom_famille.value.trim() !== "" && prenom.value.trim() !== "" && 
                         !(regExPhoneNumber.test(num_maison) == false && num_maison.trim() != "") &&
                         !(regExPhoneNumber.test(num_travail) == false && num_travail.trim() != "") &&
-                        !(regExPhoneNumber.test(num_cel) == false && num_cel.trim() != "")
+                        !(regExPhoneNumber.test(num_cel) == false && num_cel.trim() != "") &&
+                        regex_passwd.test(passwd)
 
             err_num_maison.hidden = !(regExPhoneNumber.test(num_maison) == false && num_maison.trim() != "")
             err_num_travail.hidden = !(regExPhoneNumber.test(num_travail) == false && num_travail.trim() != "")
             err_num_cell.hidden = !(regExPhoneNumber.test(num_cel) == false && num_cel.trim() != "")
-    
+            err_passwd.hidden = regex_passwd.test(passwd)
+
+            if (!canSendForm) {
+                btn_send.style.backgroundColor = "red"
+                btn_send.style.boxShadow = "none"
+                setTimeout(() => {
+                    btn_send.style.backgroundColor = "#0d6efd"
+                    btn_send.style.boxShadow = "none"
+                }, 1000)
+            }
             if (canSendForm) {sendForm();}
         }
 

@@ -29,6 +29,7 @@ if (!($ads_obj->is_users_ad($user_id, $ad_id))) {
         crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://projet03-wserveur.alwaysdata.net/private/css/style.css?v=22" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="../favicons/user.ico">
 </head>
 
 <?php
