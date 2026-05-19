@@ -41,6 +41,17 @@ class user {
         }
         return null;
     }
+
+    /**
+     * Mets à jour le mot de passe d'un utilisateur.
+     * @return void
+     */
+    public function set_passwd($new_passwd) {
+        $query = "UPDATE utilisateurs SET MotDePasse = ? WHERE Courriel = ?";
+        $stmt = $this->con->prepare($query);
+        $stmt->bind_param("ss", $new_passwd, $this->email);
+        $stmt->execute();
+    }
     /**
      * Retourne l'adresse courriel d'un utilisateur
      * @return string

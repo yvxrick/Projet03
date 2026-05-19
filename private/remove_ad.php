@@ -2,6 +2,7 @@
 require_once "../app/database/annonces.php";
 require_once "../app/functions/session_manager.php";
 logout_if_no_session();
+redirect_if_no_profile($_SESSION["email"]);
 $user_id = $_SESSION["user_id"] ?? null;
 $ad_id = $_GET["id"];
 $ads_obj = new annonces(); 

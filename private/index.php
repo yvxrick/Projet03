@@ -5,7 +5,7 @@ $user_obj = new user($_SESSION["email"]);
 $statut = $user_obj->get_statut();
 switch ($statut) {
     case 1:
-        require "admin.php";
+        require "admin/afficherAnnonces.php";
         break;
     default:
         require "user.php";

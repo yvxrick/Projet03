@@ -28,6 +28,7 @@ $no_empl = $user_obj->get_no_employe();
 $no_tel_maison = $user_obj->get_tel_maison();
 $no_tel_travail = $user_obj->get_tel_travail();
 $no_tel_cell = $user_obj->get_tel_cellulaire();
+$passwd = $user_obj->get_passwd();
 
 $no_tel_maison_public = $user_obj->get_house_number_visibility() == "P" ? true : false;
 $no_tel_travail_public = $user_obj->get_work_number_visibility() == "P" ? true : false;
@@ -47,6 +48,7 @@ $no_tel_cell_public = $user_obj->get_phone_number_visibility() == "P" ? true : f
         <label hidden="true" id="err_fname" class="invalid-fields">Veuillez entrer votre prénom</label>
 
         <p>Courriel</p> <input name="courriel" disabled class="form-control" style="width: 250px;" type="text" value="<?php echo $courriel ?>">
+        <p>Mot de passe <span id="required">*</span> </p> <input required name="passwd" class="form-control" style="width: 250px;" type="password" value="<?=$passwd?>">
         <p>Téléphone à la maison</p> <input placeholder="Facultatif" id="tel-maison" name="tel-maison" class="form-control" style="width: 250px;" type="text" value="<?php echo $no_tel_maison?>">
         <label style="margin: 0px;" hidden="true" id="err_num_maison" class="invalid-fields">Veuillez entrer un numéro de téléphone valide</label>
         <p>Téléphone au travail</p> <input placeholder="Facultatif" id="tel-travail" name="tel-travail" class="form-control" style="width: 250px;" type="text" value="<?php echo $no_tel_travail ?>">
@@ -122,6 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $tel_travail = $_POST["tel-travail"] ?? "";
     $tel_cell = $_POST["tel-cell"] ?? "";
     $statut = $_POST["statut"] ?? null;
+    $new_passwd = $_POST["passwd"] ?? "";
 
     $user_obj->set_statut($statut);
     $user_obj->set_no_empl($no_empl);
@@ -131,6 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $user_obj->set_tel_travail($tel_travail, $set_public_tel_travail);
     $user_obj->set_tel_cellulaire($tel_cell, $set_public_tel_cel);
     $user_obj->add_profile_change();
+    $user_obj->set_passwd($new_passwd);
     header("Location: index.php?page=1&num_ads=5");
     echo "OK";
     ob_get_clean();
